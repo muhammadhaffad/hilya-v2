@@ -16,9 +16,9 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function orderDetails()
+    public function orderItems()
     {
-        return $this->hasMany(OrderDetail::class);
+        return $this->hasMany(OrderItem::class);
     }
 
     public function payment()
@@ -33,7 +33,7 @@ class Order extends Model
 
     public function productItems()
     {
-        return $this->hasManyThrough(ProductItem::class, OrderDetail::class, 'order_id', 'id', 'id', 'product_item_id');
+        return $this->hasManyThrough(ProductItem::class, OrderItem::class, 'order_id', 'id', 'id', 'product_item_id');
     }
 
     public function scopeCode($query, $code)

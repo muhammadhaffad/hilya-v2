@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\ProductDetailPage;
 
 use App\Models\Order;
-use App\Models\OrderDetail;
+use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

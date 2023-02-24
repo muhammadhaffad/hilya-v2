@@ -39,8 +39,8 @@ class OrderServiceImplement implements OrderService
     {
         $order = Order::where('user_id', $userId)->code($code)->with([
             'user:id,fullname',
-            'orderDetails.productItem.product.productImage',
-            'orderDetails.productItem.product.productBrand',
+            'orderItems.productItem.product.productImage',
+            'orderItems.productItem.product.productBrand',
             'shipping.shippingAddress',
             'payment'
         ])->first();
@@ -61,8 +61,8 @@ class OrderServiceImplement implements OrderService
     {
         $orders = Order::where('user_id', $userId)->withoutStatus(['cart', 'checkout'])
             ->join('payments', 'payments.order_id', 'orders.id')
-            ->join('order_details', 'order_details.order_id', 'orders.id')
-            ->join('product_items', 'product_items.id', 'order_details.product_item_id')
+            ->join('order_items', 'order_items.order_id', 'orders.id')
+            ->join('product_items', 'product_items.id', 'order_items.product_item_id')
             ->join('products', 'products.id', 'product_items.product_id')
             ->join('product_brands', 'product_brands.id', 'products.product_brand_id')
             ->select('orders.*')

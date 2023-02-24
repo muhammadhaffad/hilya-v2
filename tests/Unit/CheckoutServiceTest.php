@@ -34,10 +34,10 @@ class CheckoutServiceTest extends TestCase
     public function calcSubTotal(Builder $query): int
     {
         $q = clone $query;
-        return $q->join('order_details', 'order_id', 'orders.id')
+        return $q->join('order_items', 'order_id', 'orders.id')
             ->join('product_items', function ($join) {
-                $join->on('product_items.id', '=', 'order_details.product_item_id');
-            })->select(DB::raw('sum(order_details.qty * product_items.price) as subtotal'))->first()->subtotal;
+                $join->on('product_items.id', '=', 'order_items.product_item_id');
+            })->select(DB::raw('sum(order_items.qty * product_items.price) as subtotal'))->first()->subtotal;
     }
 
     /**
@@ -51,7 +51,7 @@ class CheckoutServiceTest extends TestCase
         auth()->user()->orders()->first()->update(['status'=>'checkout']);
 
         $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']]);
-        $checkout->first()->orderDetails()->first()->update(['qty' => 8]);
+        $checkout->first()->orderItems()->first()->update(['qty' => 8]);
         $response = $this->checkoutService->changeAddressShipping(2);
         dump($response);
         $this->assertContainsEquals(200, $response);
@@ -63,7 +63,7 @@ class CheckoutServiceTest extends TestCase
         auth()->user()->orders()->first()->update(['status'=>'checkout']);
 
         $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']]);
-        $checkout->first()->orderDetails()->first()->update(['qty' => 8]);
+        $checkout->first()->orderItems()->first()->update(['qty' => 8]);
         $response = $this->checkoutService->changeAddressShipping(200);
         dump($response);
         $this->assertContainsEquals(404, $response);

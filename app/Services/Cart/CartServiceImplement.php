@@ -36,10 +36,10 @@ class CartServiceImplement implements CartService
     public function checkUnvailableProducts(Builder $query): array
     {
         $q = clone $query;
-        return $q->join('order_details', 'order_id', 'orders.id')
+        return $q->join('order_items', 'order_id', 'orders.id')
             ->join('product_items', function ($join) {
-                $join->on('product_items.id', '=', 'order_details.product_item_id')
-                    ->on('product_items.stock', '<', 'order_details.qty');
+                $join->on('product_items.id', '=', 'order_items.product_item_id')
+                    ->on('product_items.stock', '<', 'order_items.qty');
             })->get()
             ->mapWithKeys(fn ($item, $key) => ["product_items.$item->product_item_id" => "Stok sudah habis atau jumlah pesanan lebih dari stok"])
             ->toArray();
@@ -53,10 +53,10 @@ class CartServiceImplement implements CartService
     public function calcSubTotal(Builder $query): int
     {
         $q = clone $query;
-        return $q->join('order_details', 'order_id', 'orders.id')
+        return $q->join('order_items', 'order_id', 'orders.id')
             ->join('product_items', function ($join) {
-                $join->on('product_items.id', '=', 'order_details.product_item_id');
-            })->select(DB::raw('sum(order_details.qty * product_items.price) as subtotal'))->first()->subtotal;
+                $join->on('product_items.id', '=', 'order_items.product_item_id');
+            })->select(DB::raw('sum(order_items.qty * product_items.price) as subtotal'))->first()->subtotal;
     }
     /**
      * calcWeightTotal
@@ -67,10 +67,10 @@ class CartServiceImplement implements CartService
     public function calcWeightTotal(Builder $query): int
     {
         $q = clone $query;
-        return $q->join('order_details', 'order_id', 'orders.id')
+        return $q->join('order_items', 'order_id', 'orders.id')
             ->join('product_items', function ($join) {
-                $join->on('product_items.id', '=', 'order_details.product_item_id');
-            })->select(DB::raw('sum(order_details.qty * product_items.weight) as totalweight'))->first()->totalweight;
+                $join->on('product_items.id', '=', 'order_items.product_item_id');
+            })->select(DB::raw('sum(order_items.qty * product_items.weight) as totalweight'))->first()->totalweight;
     }
     /**
      * getCart
@@ -85,11 +85,11 @@ class CartServiceImplement implements CartService
 
         $cart = Order::where([['user_id', auth()->user()->id], ['status', 'cart']])->first()
             ?->load([
-                'orderDetails:id,order_id,product_item_id,qty',
-                'orderDetails.productItem:id,product_id,gender,age,size,color,fabric,model,price,weight',
-                'orderDetails.productItem.product:id,product_brand_id,name',
-                'orderDetails.productItem.product.productImage:id,product_images.product_id,image',
-                'orderDetails.productItem.product.productBrand:id,name,image'
+                'orderItems:id,order_id,product_item_id,qty',
+                'orderItems.productItem:id,product_id,gender,age,size,color,fabric,model,price,weight',
+                'orderItems.productItem.product:id,product_brand_id,name',
+                'orderItems.productItem.product.productImage:id,product_images.product_id,image',
+                'orderItems.productItem.product.productBrand:id,name,image'
             ])->get();
         return array(
             'code' => $cart?->all() ? 200 : 404,
@@ -108,21 +108,21 @@ class CartServiceImplement implements CartService
         if ($hasCheckout)
             return $hasCheckout();
 
-        $orderDetail = Order::where([['user_id', auth()->user()->id], ['status', 'cart']])
-            ->first()->orderDetails()->find($orderDetailId);
-        if (!$orderDetail)
+        $orderItem = Order::where([['user_id', auth()->user()->id], ['status', 'cart']])
+            ->first()->orderItems()->find($orderDetailId);
+        if (!$orderItem)
             return array(
                 'code' => 404,
                 'data' => array()
             );
-        $productItem = $orderDetail->productItem()->first();
-        if ($orderDetail->qty < $productItem->stock) {
-            $orderDetail->qty += 1;
-            if ($orderDetail->save())
+        $productItem = $orderItem->productItem()->first();
+        if ($orderItem->qty < $productItem->stock) {
+            $orderItem->qty += 1;
+            if ($orderItem->save())
                 return array(
                     'code' => 200,
                     'data' => array(
-                        'qty' => $orderDetail->qty
+                        'qty' => $orderItem->qty
                     )
                 );
             else
@@ -153,20 +153,20 @@ class CartServiceImplement implements CartService
         if ($hasCheckout)
             return $hasCheckout();
 
-        $orderDetail = Order::where([['user_id', auth()->user()->id], ['status', 'cart']])
-            ->first()->orderDetails()->find($orderDetailId);
-        if (!$orderDetail)
+        $orderItem = Order::where([['user_id', auth()->user()->id], ['status', 'cart']])
+            ->first()->orderItems()->find($orderDetailId);
+        if (!$orderItem)
             return array(
                 'code' => 404,
                 'data' => array()
             );
-        if ($orderDetail->qty > 1) {
-            $orderDetail->qty -= 1;
-            if ($orderDetail->save())
+        if ($orderItem->qty > 1) {
+            $orderItem->qty -= 1;
+            if ($orderItem->save())
                 return array(
                     'code' => 200,
                     'data' => array(
-                        'qty' => $orderDetail->qty
+                        'qty' => $orderItem->qty
                     )
                 );
             else
@@ -197,14 +197,14 @@ class CartServiceImplement implements CartService
         if ($hasCheckout)
             return $hasCheckout();
 
-        $orderDetail = Order::where([['user_id', auth()->user()->id], ['status', 'cart']])
-            ->first()->orderDetails()->find($orderDetailId);
-        if (!$orderDetail)
+        $orderItem = Order::where([['user_id', auth()->user()->id], ['status', 'cart']])
+            ->first()->orderItems()->find($orderDetailId);
+        if (!$orderItem)
             return array(
                 'code' => 404,
                 'data' => array()
             );
-        if ($orderDetail->delete())
+        if ($orderItem->delete())
             return array(
                 'code' => 200,
                 'data' => array(
@@ -257,7 +257,7 @@ class CartServiceImplement implements CartService
                 'totalweight' => 0,
                 'status' => 'cart'
             ])->first();
-        $cart->first()->orderDetails()->create([
+        $cart->first()->orderItems()->create([
             'product_item_id' => $productItem->id,
             'qty' => $qty
         ]);

@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\OrderHistoryPage;
 
 use App\Models\Order;
-use App\Models\OrderDetail as ModelsOrderDetail;
+use App\Models\OrderItem as ModelsOrderDetail;
 use App\Models\Payment;
 use App\Models\Shipping;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
-class OrderDetail
+class OrderItem
 {
     public static function getOrder($code)
     {
@@ -19,7 +19,7 @@ class OrderDetail
         if (!$order) {
             return abort(404);
         }
-        $orderDetails = $order->orderDetails()
+        $orderItems = $order->orderItems()
             ->with(['productItem.product', 
                 'productItem.product.productImages', 
                 'productItem.product.productBrand'
@@ -27,6 +27,6 @@ class OrderDetail
             ->get();
         $shipping = $order->shipping()->with('shippingAddress')->first();
         $payment = $order->payment()->first();
-        return compact('order', 'orderDetails', 'shipping', 'payment');
+        return compact('order', 'orderItems', 'shipping', 'payment');
     }
 }

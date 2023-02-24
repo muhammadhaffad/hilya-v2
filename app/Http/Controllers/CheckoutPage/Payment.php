@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\CheckoutPage;
 
 use App\Models\Order;
-use App\Models\OrderDetail;
+use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -11,18 +11,18 @@ class Payment
 {
     private static function checkProductUnavailable($order)
     {
-        return $order->join('order_details', 'order_id', 'orders.id')
+        return $order->join('order_items', 'order_id', 'orders.id')
             ->join('product_items', function ($join) {
-                $join->on('product_items.id', '=', 'order_details.product_item_id')
-                    ->on('product_items.stock', '<', 'order_details.qty');
+                $join->on('product_items.id', '=', 'order_items.product_item_id')
+                    ->on('product_items.stock', '<', 'order_items.qty');
             })->get();
     }
     private static function calcSubTotalOrderItems($order)
     {
-        return $order->join('order_details', 'order_id', 'orders.id')
+        return $order->join('order_items', 'order_id', 'orders.id')
             ->join('product_items', function ($join) {
-                $join->on('product_items.id', '=', 'order_details.product_item_id');
-            })->select(DB::raw('sum(order_details.qty * product_items.price) as subtotal'))->first()->subtotal;
+                $join->on('product_items.id', '=', 'order_items.product_item_id');
+            })->select(DB::raw('sum(order_items.qty * product_items.price) as subtotal'))->first()->subtotal;
     }
     public static function processPayment($service, $bank)
     {

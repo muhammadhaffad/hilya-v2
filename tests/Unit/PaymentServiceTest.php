@@ -25,10 +25,10 @@ class PaymentServiceTest extends TestCase
     public function calcSubTotal(Builder $query): int
     {
         $q = clone $query;
-        return $q->join('order_details', 'order_id', 'orders.id')
+        return $q->join('order_items', 'order_id', 'orders.id')
             ->join('product_items', function ($join) {
-                $join->on('product_items.id', '=', 'order_details.product_item_id');
-            })->select(DB::raw('sum(order_details.qty * product_items.price) as subtotal'))->first()->subtotal;
+                $join->on('product_items.id', '=', 'order_items.product_item_id');
+            })->select(DB::raw('sum(order_items.qty * product_items.price) as subtotal'))->first()->subtotal;
     }
     /**
      * A basic unit test example.

@@ -15,8 +15,8 @@ class ProductItem extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function orderDetails() {
-        return $this->hasMany(OrderDetail::class);
+    public function orderItems() {
+        return $this->hasMany(OrderItem::class);
     }
 
     public function scopeKoko($query)

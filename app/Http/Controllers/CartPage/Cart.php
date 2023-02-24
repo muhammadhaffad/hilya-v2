@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\CartPage;
 
 use App\Models\Order;
-use App\Models\OrderDetail;
+use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\Shipping;
 use App\Models\ShippingAddress;
@@ -21,51 +21,51 @@ class Cart
         $order = auth()->user()->cart()->first();
         if (!$order->exists())
             abort(404);
-        $orderDetails = $order->orderDetails()
+        $orderItems = $order->orderItems()
             ->with([
                 'productItem.product',
                 'productItem.product.productImages',
                 'productItem.product.productBrand'
             ])
             ->get();
-        return compact('order', 'orderDetails');
+        return compact('order', 'orderItems');
     }
 
-    public static function addQty($order_detail_id)
+    public static function addQty($order_item_id)
     {
-        $orderDetail = auth()->user()->cart()->first()->orderDetails()->find($order_detail_id);
-        if (!$orderDetail->exists())
+        $orderItem = auth()->user()->cart()->first()->orderItems()->find($order_item_id);
+        if (!$orderItem->exists())
             abort(404);
-        $productItem = $orderDetail->productItem()->first();
-        if ($orderDetail->qty < $productItem->stock) {
-            $orderDetail->qty += 1;
-            $orderDetail->save();
+        $productItem = $orderItem->productItem()->first();
+        if ($orderItem->qty < $productItem->stock) {
+            $orderItem->qty += 1;
+            $orderItem->save();
             return response('Quantity successfully added', 200);
         } else {
             return response('Quantity failed to add', 403);
         }
     }
 
-    public static function subQty($order_detail_id)
+    public static function subQty($order_item_id)
     {
-        $orderDetail = auth()->user()->cart()->first()->orderDetails()->find($order_detail_id);
-        if (!$orderDetail->exists())
+        $orderItem = auth()->user()->cart()->first()->orderItems()->find($order_item_id);
+        if (!$orderItem->exists())
             abort(404);
-        if ($orderDetail->qty > 0) {
-            $orderDetail->qty -= 1;
-            $orderDetail->save();
+        if ($orderItem->qty > 0) {
+            $orderItem->qty -= 1;
+            $orderItem->save();
             return response('Quantity successfully added', 200);
         } else {
             return response('Quantity failed to add', 403);
         }
     }
 
-    public static function removeItem($order_detail_id)
+    public static function removeItem($order_item_id)
     {
-        $orderDetail = auth()->user()->cart()->first()->orderDetails()->find($order_detail_id);
-        if (!$orderDetail->exists())
+        $orderItem = auth()->user()->cart()->first()->orderItems()->find($order_item_id);
+        if (!$orderItem->exists())
             abort(404);
-        if ($orderDetail->delete()) {
+        if ($orderItem->delete()) {
             return back()->with('success', 'Item successfully removed');
         } else {
             abort(500);
@@ -74,10 +74,10 @@ class Cart
 
     private static function productsUnavailable ($order)
     {
-        return $order->join('order_details', 'order_id', 'orders.id')
+        return $order->join('order_items', 'order_id', 'orders.id')
         ->join('product_items', function ($join) {
-            $join->on('product_items.id', '=', 'order_details.product_item_id')
-                ->on('product_items.stock', '<', 'order_details.qty');
+            $join->on('product_items.id', '=', 'order_items.product_item_id')
+                ->on('product_items.stock', '<', 'order_items.qty');
         })->get()->mapWithKeys(fn ($item, $key) => ["product_items.$item->product_item_id" => "Produk sudah habis"]);
     }
 

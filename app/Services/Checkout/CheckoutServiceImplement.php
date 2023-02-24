@@ -28,10 +28,10 @@ class CheckoutServiceImplement implements CheckoutService
     public function checkUnvailableProducts(Builder $query): array
     {
         $q = clone $query;
-        return $q->join('order_details', 'order_id', 'orders.id')
+        return $q->join('order_items', 'order_id', 'orders.id')
             ->join('product_items', function ($join) {
-                $join->on('product_items.id', '=', 'order_details.product_item_id')
-                    ->on('product_items.stock', '<', 'order_details.qty');
+                $join->on('product_items.id', '=', 'order_items.product_item_id')
+                    ->on('product_items.stock', '<', 'order_items.qty');
             })->get()
             ->mapWithKeys(fn ($item, $key) => ["product_items.$item->product_item_id" => "Produk sudah habis"])
             ->toArray();
@@ -165,7 +165,7 @@ class CheckoutServiceImplement implements CheckoutService
                 'status' => $transaction['transaction_status'],
                 'transactiontime' => $transaction['transaction_time']
             ]);
-            foreach ($checkout->first()->orderDetails()->get()->all() as $item) {
+            foreach ($checkout->first()->orderItems()->get()->all() as $item) {
                 $item->productItem()->decrement('stock', $item->qty);
             }
             $codeOrder = $checkout->first()->code;

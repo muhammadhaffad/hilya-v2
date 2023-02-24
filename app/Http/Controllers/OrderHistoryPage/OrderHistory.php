@@ -12,8 +12,8 @@ class OrderHistory
     {
         $orders = auth()->user()->orders()->withoutStatus(['cart', 'checkout'])
             ->join('payments', 'payments.order_id', 'orders.id')
-            ->join('order_details', 'order_details.order_id', 'orders.id')
-            ->join('product_items', 'product_items.id', 'order_details.product_item_id')
+            ->join('order_items', 'order_items.order_id', 'orders.id')
+            ->join('product_items', 'product_items.id', 'order_items.product_item_id')
             ->join('products', 'products.id', 'product_items.product_id')
             ->join('product_brands', 'product_brands.id', 'products.product_brand_id')
             ->select('orders.*')

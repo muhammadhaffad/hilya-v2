@@ -47,11 +47,11 @@ Route::get('/sign-up', fn () => 'sign up page');
 Route::post('/sign-up', [CustomerController::class, 'signUp'])->middleware('guest');
 Route::post('/sign-out', [AuthenticationController::class, 'signOut'])->middleware('auth');
 Route::get('/customer/orders', [OrderController::class, 'orderHistory']);
-Route::get('/customer/orders/{code}', [OrderController::class, 'orderDetail']);
+Route::get('/customer/orders/{code}', [OrderController::class, 'orderItem']);
 Route::get('/customer/cart', [CartController::class, 'index']);
-Route::post('/customer/cart/{order_detail_id}/add', [CartController::class, 'add']);
-Route::post('/customer/cart/{order_detail_id}/sub', [CartController::class, 'sub']);
-Route::post('/customer/cart/{order_detail_id}/remove', [CartController::class, 'remove']);
+Route::post('/customer/cart/{order_item_id}/add', [CartController::class, 'add']);
+Route::post('/customer/cart/{order_item_id}/sub', [CartController::class, 'sub']);
+Route::post('/customer/cart/{order_item_id}/remove', [CartController::class, 'remove']);
 Route::get('/customer/checkout', fn () => 'abcd')->name('checkout');
 Route::get('/test', function () {
     auth()->loginUsingId(1);

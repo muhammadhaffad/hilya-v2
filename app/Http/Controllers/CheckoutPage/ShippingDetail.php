@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\ShippingDetail;
 
 use App\Models\Order;
-use App\Models\OrderDetail;
+use App\Models\OrderItem;
 use App\Models\ShippingAddress;
 use Illuminate\Support\Facades\Auth;
 

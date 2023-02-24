@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\ProductDetailPage;
 
 use App\Models\Order;
-use App\Models\OrderDetail;
+use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Support\Str;
 
@@ -33,7 +33,7 @@ class Cart
                 'code' => Str::orderedUuid(),
                 'status' => 'cart'
             ])->first();
-        $isCreated = $cart->orderDetails()->create([
+        $isCreated = $cart->orderItems()->create([
             'product_item_id' => $productItem->id,
             'qty' => $qty
         ]);

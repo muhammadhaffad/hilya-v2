@@ -6,7 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\ProductItem;
 use App\Models\Order;
-use App\Models\OrderDetail;
+use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\ProductBrand;
@@ -53,7 +53,7 @@ class DatabaseSeeder extends Seeder
         $users->each(function($user) {
             $user->orders()->each(function($order) {
                 for ($i=0; $i < 3; $i++) { 
-                    $order->orderDetails()->save(OrderDetail::factory()->productItem(25)->make());
+                    $order->orderItems()->save(OrderItem::factory()->productItem(25)->make());
                 }
             });
         });

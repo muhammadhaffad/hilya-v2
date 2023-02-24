@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\OrderHistoryPage\OrderDetail;
+use App\Http\Controllers\OrderHistoryPage\OrderItem;
 use App\Http\Controllers\OrderHistoryPage\OrderHistory;
 use App\Services\Order\OrderService;
 use Illuminate\Http\Request;
@@ -31,7 +31,7 @@ class OrderController extends Controller
         }
     }
 
-    public function orderDetail($code)
+    public function orderItem($code)
     {
         $order = $this->orderService->getDetailOrder(auth()->user()->id, $code);
         $order['data'] ?: abort(404);

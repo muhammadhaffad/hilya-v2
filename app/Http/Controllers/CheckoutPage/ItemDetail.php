@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\CheckoutPage;
 
 use App\Models\Order;
-use App\Models\OrderDetail;
+use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
 
 class ItemDetail
@@ -11,12 +11,12 @@ class ItemDetail
     public static function getItems() 
     {
         $order = auth()->user()->cart()->first();
-        $orderDetails = $order->orderDetails()
+        $orderItems = $order->orderItems()
             ->with(['product_item.product', 
                 'productItem.product.product_images', 
                 'productItem.product.product_brand'
             ])
             ->get();
-        return compact('order', 'orderDetails');
+        return compact('order', 'orderItems');
     }
 }
