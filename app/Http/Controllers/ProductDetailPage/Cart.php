@@ -15,14 +15,14 @@ class Cart
                 'add_to_cart' => 'Please complete your checkout first!'
             ]);
         }
-        $productDetail = $product->load([
-            'productDetails' => function ($query) use ($productDetailId) {
+        $productItem = $product->load([
+            'productItems' => function ($query) use ($productDetailId) {
                 $query->find($productDetailId);
-            }])->productDetails->first();
-        if (!$productDetail) {
+            }])->productItems->first();
+        if (!$productItem) {
             abort(404);
         }
-        if ($productDetail->stock < $qty) {
+        if ($productItem->stock < $qty) {
             return back()->withErrors([
                 'qty' => 'Quantity must not exceed stock'
             ]);
@@ -34,7 +34,7 @@ class Cart
                 'status' => 'cart'
             ])->first();
         $isCreated = $cart->orderDetails()->create([
-            'product_detail_id' => $productDetail->id,
+            'product_item_id' => $productItem->id,
             'qty' => $qty
         ]);
         if ($isCreated) {

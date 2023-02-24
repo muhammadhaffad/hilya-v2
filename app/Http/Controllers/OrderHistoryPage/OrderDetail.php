@@ -20,9 +20,9 @@ class OrderDetail
             return abort(404);
         }
         $orderDetails = $order->orderDetails()
-            ->with(['productDetail.product', 
-                'productDetail.product.productImages', 
-                'productDetail.product.productBrand'
+            ->with(['productItem.product', 
+                'productItem.product.productImages', 
+                'productItem.product.productBrand'
             ])
             ->get();
         $shipping = $order->shipping()->with('shippingAddress')->first();

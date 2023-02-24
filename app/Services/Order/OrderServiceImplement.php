@@ -17,9 +17,9 @@ class OrderServiceImplement implements OrderService
         $orders = Order::where('user_id', $userId)->withoutStatus(['cart', 'checkout'])
             ->whereDate('created_at', '>=', now()->subDays(30))
             ->with([
-                'productDetails.product:id,product_brand_id,name',
-                'productDetails.product.productImage',
-                'productDetails.product.productBrand',
+                'productItems.product:id,product_brand_id,name',
+                'productItems.product.productImage',
+                'productItems.product.productBrand',
                 'payment:id,order_id,transactiontime,settlementtime,amount'
             ])->orderBy('created_at', 'desc')->get();
         return array(
@@ -39,8 +39,8 @@ class OrderServiceImplement implements OrderService
     {
         $order = Order::where('user_id', $userId)->code($code)->with([
             'user:id,fullname',
-            'orderDetails.productDetail.product.productImage',
-            'orderDetails.productDetail.product.productBrand',
+            'orderDetails.productItem.product.productImage',
+            'orderDetails.productItem.product.productBrand',
             'shipping.shippingAddress',
             'payment'
         ])->first();
@@ -62,17 +62,17 @@ class OrderServiceImplement implements OrderService
         $orders = Order::where('user_id', $userId)->withoutStatus(['cart', 'checkout'])
             ->join('payments', 'payments.order_id', 'orders.id')
             ->join('order_details', 'order_details.order_id', 'orders.id')
-            ->join('product_details', 'product_details.id', 'order_details.product_detail_id')
-            ->join('products', 'products.id', 'product_details.product_id')
+            ->join('product_items', 'product_items.id', 'order_details.product_item_id')
+            ->join('products', 'products.id', 'product_items.product_id')
             ->join('product_brands', 'product_brands.id', 'products.product_brand_id')
             ->select('orders.*')
             ->distinct();
         if ($criteria['search']) {
             $orders->where(function ($query) use ($criteria) {
                 $query->where('orders.code', 'LIKE', '%' . $criteria['search'] . '%')
-                    ->orWhere('product_details.gender', 'LIKE', '%' . $criteria['search'] . '%')
-                    ->orWhere('product_details.age', 'LIKE', '%' . $criteria['search'] . '%')
-                    ->orWhere('product_details.model', 'LIKE', '%' . $criteria['search'] . '%')
+                    ->orWhere('product_items.gender', 'LIKE', '%' . $criteria['search'] . '%')
+                    ->orWhere('product_items.age', 'LIKE', '%' . $criteria['search'] . '%')
+                    ->orWhere('product_items.model', 'LIKE', '%' . $criteria['search'] . '%')
                     ->orWhere('product_brands.name', 'LIKE', '%' . $criteria['search'] . '%')
                     ->orWhere('products.name', 'LIKE', '%' . $criteria['search'] . '%');
             });
@@ -90,9 +90,9 @@ class OrderServiceImplement implements OrderService
             $orders->where(fn ($q) => $q->whereDate('orders.created_at', '>=', now()->subDays(30)));
         }
         $orders->with([
-            'productDetails.product:id,product_brand_id,name',
-            'productDetails.product.productImage',
-            'productDetails.product.productBrand',
+            'productItems.product:id,product_brand_id,name',
+            'productItems.product.productImage',
+            'productItems.product.productBrand',
             'payment:id,order_id,transactiontime,settlementtime,amount'
         ])->orderBy('created_at', 'desc')->get();
         return array(

@@ -12,9 +12,9 @@ class ItemDetail
     {
         $order = auth()->user()->cart()->first();
         $orderDetails = $order->orderDetails()
-            ->with(['product_detail.product', 
-                'productDetail.product.product_images', 
-                'productDetail.product.product_brand'
+            ->with(['product_item.product', 
+                'productItem.product.product_images', 
+                'productItem.product.product_brand'
             ])
             ->get();
         return compact('order', 'orderDetails');

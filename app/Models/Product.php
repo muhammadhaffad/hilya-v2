@@ -25,8 +25,8 @@ class Product extends Model
         return $this->hasOne(ProductImage::class)->ofMany('id', 'MIN');
     }
 
-    public function productDetails() {
-        return $this->hasMany(ProductDetail::class);
+    public function productItems() {
+        return $this->hasMany(ProductItem::class);
     }
     
     public function getLinkAttribute() {

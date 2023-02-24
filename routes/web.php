@@ -13,7 +13,7 @@ use App\Http\Controllers\PromoProductController;
 use App\Http\Controllers\ReadyProductController;
 use App\Http\Controllers\TestController;
 use App\Models\Order;
-use App\Models\ProductDetail;
+use App\Models\ProductItem;
 use App\Models\ShippingAddress;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;

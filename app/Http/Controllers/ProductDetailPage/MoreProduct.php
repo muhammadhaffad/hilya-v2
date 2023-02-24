@@ -8,15 +8,15 @@ use Illuminate\Http\Request;
 class MoreProduct
 {
     public static function getMoreProducts() {
-        return Product::whereHas('productDetails', fn ($q) => $q->inStock())
+        return Product::whereHas('productItems', fn ($q) => $q->inStock())
             ->with([
                 'productBrand:id,name',
                 'productImages:product_id,id,image'
             ])->withMin(
-                'productDetails',
+                'productItems',
                 'price'
             )->withMax(
-                'productDetails',
+                'productItems',
                 'price'
             );
     }

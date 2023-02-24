@@ -14,19 +14,19 @@ class MidtransPaymentServiceImplement implements PaymentService
             return array();
         $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']]);
         $itemDetails = $checkout->first()->orderDetails()->with([
-            'productDetail:id,product_id,gender,age,size,model,fabric,price',
-            'productDetail.product:id,product_brand_id,name',
-            'productDetail.product.productBrand:id,name'
-        ])->get(['qty', 'product_detail_id'])->map(function ($item, $key) {
-            $brandName = $item->productDetail->product->productBrand->name;
-            $productName = $item->productDetail->product->name;
-            $gender = $item->productDetail->gender;
-            $age = $item->productDetail->age;
-            $size = $item->productDetail->size;
-            $model = $item->productDetail->model;
+            'productItem:id,product_id,gender,age,size,model,fabric,price',
+            'productItem.product:id,product_brand_id,name',
+            'productItem.product.productBrand:id,name'
+        ])->get(['qty', 'product_item_id'])->map(function ($item, $key) {
+            $brandName = $item->productItem->product->productBrand->name;
+            $productName = $item->productItem->product->name;
+            $gender = $item->productItem->gender;
+            $age = $item->productItem->age;
+            $size = $item->productItem->size;
+            $model = $item->productItem->model;
             return array(
-                'id' => 'product-detail.' . $item->productDetail->id,
-                'price' => (int) $item->productDetail->price,
+                'id' => 'product-detail.' . $item->productItem->id,
+                'price' => (int) $item->productItem->price,
                 'quantity' => (int) $item->qty,
                 'name' => "($brandName) $productName $gender $age ($size) $model"
             );

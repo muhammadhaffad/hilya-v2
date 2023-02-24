@@ -8,14 +8,14 @@ use Illuminate\Http\Request;
 class PromoProduct
 {
     public static function getPreorderProducts() {
-        return Product::promo()->whereHas('productDetails', fn ($q) => $q->inStock())
+        return Product::promo()->whereHas('productItems', fn ($q) => $q->inStock())
             ->with([
                 'productBrand:id,name',
                 'productImages:product_id,id,image'
             ])->withMin(
-                'productDetails', 'price'
+                'productItems', 'price'
             )->withMax(
-                'productDetails', 'price'
+                'productItems', 'price'
             );
     }
 }

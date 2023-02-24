@@ -9,14 +9,14 @@ class BrandProduct
 {
     public static function getBrandProducts($brand) {
         return Product::withBrand([$brand->id])
-            ->whereHas('productDetails', fn ($q) => $q->inStock())
+            ->whereHas('productItems', fn ($q) => $q->inStock())
             ->with([
                 'productBrand:id,name',
                 'productImages:product_id,id,image'
             ])->withMin(
-                'productDetails', 'price'
+                'productItems', 'price'
             )->withMax(
-                'productDetails', 'price'
+                'productItems', 'price'
             );
     }
 }

@@ -13,17 +13,17 @@ class OrderHistory
         $orders = auth()->user()->orders()->withoutStatus(['cart', 'checkout'])
             ->join('payments', 'payments.order_id', 'orders.id')
             ->join('order_details', 'order_details.order_id', 'orders.id')
-            ->join('product_details', 'product_details.id', 'order_details.product_detail_id')
-            ->join('products', 'products.id', 'product_details.product_id')
+            ->join('product_items', 'product_items.id', 'order_details.product_item_id')
+            ->join('products', 'products.id', 'product_items.product_id')
             ->join('product_brands', 'product_brands.id', 'products.product_brand_id')
             ->select('orders.*')
             ->distinct();
         if ($keyword) {
             $orders = $orders->where(function ($query) use ($keyword) {
                 $query->where('orders.code', 'LIKE', '%' . $keyword . '%')
-                    ->orWhere('product_details.gender', 'LIKE', '%' . $keyword . '%')
-                    ->orWhere('product_details.age', 'LIKE', '%' . $keyword . '%')
-                    ->orWhere('product_details.model', 'LIKE', '%' . $keyword . '%')
+                    ->orWhere('product_items.gender', 'LIKE', '%' . $keyword . '%')
+                    ->orWhere('product_items.age', 'LIKE', '%' . $keyword . '%')
+                    ->orWhere('product_items.model', 'LIKE', '%' . $keyword . '%')
                     ->orWhere('product_brands.name', 'LIKE', '%' . $keyword . '%')
                     ->orWhere('products.name', 'LIKE', '%' . $keyword . '%');
             });

@@ -31,9 +31,9 @@ class Order extends Model
         return $this->hasOne(Shipping::class);
     }
 
-    public function productDetails()
+    public function productItems()
     {
-        return $this->hasManyThrough(ProductDetail::class, OrderDetail::class, 'order_id', 'id', 'id', 'product_detail_id');
+        return $this->hasManyThrough(ProductItem::class, OrderDetail::class, 'order_id', 'id', 'id', 'product_item_id');
     }
 
     public function scopeCode($query, $code)

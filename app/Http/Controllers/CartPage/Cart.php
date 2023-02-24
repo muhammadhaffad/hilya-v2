@@ -23,9 +23,9 @@ class Cart
             abort(404);
         $orderDetails = $order->orderDetails()
             ->with([
-                'productDetail.product',
-                'productDetail.product.productImages',
-                'productDetail.product.productBrand'
+                'productItem.product',
+                'productItem.product.productImages',
+                'productItem.product.productBrand'
             ])
             ->get();
         return compact('order', 'orderDetails');
@@ -36,8 +36,8 @@ class Cart
         $orderDetail = auth()->user()->cart()->first()->orderDetails()->find($order_detail_id);
         if (!$orderDetail->exists())
             abort(404);
-        $productDetail = $orderDetail->productDetail()->first();
-        if ($orderDetail->qty < $productDetail->stock) {
+        $productItem = $orderDetail->productItem()->first();
+        if ($orderDetail->qty < $productItem->stock) {
             $orderDetail->qty += 1;
             $orderDetail->save();
             return response('Quantity successfully added', 200);
@@ -75,10 +75,10 @@ class Cart
     private static function productsUnavailable ($order)
     {
         return $order->join('order_details', 'order_id', 'orders.id')
-        ->join('product_details', function ($join) {
-            $join->on('product_details.id', '=', 'order_details.product_detail_id')
-                ->on('product_details.stock', '<', 'order_details.qty');
-        })->get()->mapWithKeys(fn ($item, $key) => ["product_details.$item->product_detail_id" => "Produk sudah habis"]);
+        ->join('product_items', function ($join) {
+            $join->on('product_items.id', '=', 'order_details.product_item_id')
+                ->on('product_items.stock', '<', 'order_details.qty');
+        })->get()->mapWithKeys(fn ($item, $key) => ["product_items.$item->product_item_id" => "Produk sudah habis"]);
     }
 
     public static function processCheckout()

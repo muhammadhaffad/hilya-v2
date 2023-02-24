@@ -29,11 +29,11 @@ class CheckoutServiceImplement implements CheckoutService
     {
         $q = clone $query;
         return $q->join('order_details', 'order_id', 'orders.id')
-            ->join('product_details', function ($join) {
-                $join->on('product_details.id', '=', 'order_details.product_detail_id')
-                    ->on('product_details.stock', '<', 'order_details.qty');
+            ->join('product_items', function ($join) {
+                $join->on('product_items.id', '=', 'order_details.product_item_id')
+                    ->on('product_items.stock', '<', 'order_details.qty');
             })->get()
-            ->mapWithKeys(fn ($item, $key) => ["product_details.$item->product_detail_id" => "Produk sudah habis"])
+            ->mapWithKeys(fn ($item, $key) => ["product_items.$item->product_item_id" => "Produk sudah habis"])
             ->toArray();
     }
     /**
@@ -166,7 +166,7 @@ class CheckoutServiceImplement implements CheckoutService
                 'transactiontime' => $transaction['transaction_time']
             ]);
             foreach ($checkout->first()->orderDetails()->get()->all() as $item) {
-                $item->productDetail()->decrement('stock', $item->qty);
+                $item->productItem()->decrement('stock', $item->qty);
             }
             $codeOrder = $checkout->first()->code;
             /* tidak membuat kondisi where status = checkout berubah menjadi status = pending*/

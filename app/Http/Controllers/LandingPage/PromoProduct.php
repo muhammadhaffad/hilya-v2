@@ -9,17 +9,17 @@ class PromoProduct
 {
     public static function getPromoProducts()
     {
-        return Product::promo()->whereHas('productDetails', function ($query) {
+        return Product::promo()->whereHas('productItems', function ($query) {
                 $query->inStock();
             })
             ->with([
                 'productBrand:id,name',
                 'productImages:product_id,id,image'
             ])->withMin(
-                'productDetails',
+                'productItems',
                 'price'
             )->withMax(
-                'productDetails',
+                'productItems',
                 'price'
             );
     }

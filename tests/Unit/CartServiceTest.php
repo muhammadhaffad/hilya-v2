@@ -48,7 +48,7 @@ class CartServiceTest extends TestCase
         auth()->loginUsingId(1);
 
         $cart = Order::where([['user_id', auth()->user()->id], ['orders.id', 1]]);
-        dump($cart->with('orderDetails:id,order_id,product_detail_id,qty', 'orderDetails.productDetail:id,price')->get('id')->toArray());
+        dump($cart->with('orderDetails:id,order_id,product_item_id,qty', 'orderDetails.productItem:id,price')->get('id')->toArray());
         $result = $this->cartService->calcSubTotal($cart);
         dump($result);
         $this->assertIsInt($result);
@@ -59,7 +59,7 @@ class CartServiceTest extends TestCase
         auth()->loginUsingId(1);
 
         $cart = Order::where([['user_id', auth()->user()->id], ['orders.id', 1]]);
-        dump($cart->with('orderDetails:id,order_id,product_detail_id,qty', 'orderDetails.productDetail:id,weight')->get('id')->toArray());
+        dump($cart->with('orderDetails:id,order_id,product_item_id,qty', 'orderDetails.productItem:id,weight')->get('id')->toArray());
         $result = $this->cartService->calcWeightTotal($cart);
         dump($result);
         $this->assertIsInt($result);   

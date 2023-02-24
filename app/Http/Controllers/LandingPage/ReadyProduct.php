@@ -9,17 +9,17 @@ class ReadyProduct
 {
     public static function getReadyProducts()
     {
-        return Product::ready()->whereHas('productDetails', function ($query) {
+        return Product::ready()->whereHas('productItems', function ($query) {
                 $query->inStock();
             })
             ->with([
                 'productBrand:id,name',
                 'productImages:product_id,id,image'
             ])->withMin(
-                'productDetails',
+                'productItems',
                 'price'
             )->withMax(
-                'productDetails',
+                'productItems',
                 'price'
             );
     }

@@ -19,11 +19,11 @@ class ProductServiceImplement implements ProductService
         'products.availability',
         'products.ispromo',
         'product_brands.name',
-        'product_details.gender',
-        'product_details.age',
-        'product_details.color',
-        'product_details.fabric',
-        'product_details.model'
+        'product_items.gender',
+        'product_items.age',
+        'product_items.color',
+        'product_items.fabric',
+        'product_items.model'
     ];
 
     /**
@@ -36,10 +36,10 @@ class ProductServiceImplement implements ProductService
      */
     public function getProducts(int $offset = null, int $limit = null, int $paginate = null): array
     {
-        $products = Product::whereHas('productDetails', fn ($q) => $q->inStock())
+        $products = Product::whereHas('productItems', fn ($q) => $q->inStock())
             ->with(['productImages:product_id,id,image', 'productBrand:id,name'])
-            ->withMin('productDetails', 'price')
-            ->withMax('productDetails', 'price');
+            ->withMin('productItems', 'price')
+            ->withMax('productItems', 'price');
         if ($offset !== null && $limit !== null) {
             $productsLimit = $products->offset($offset)->limit($limit)->get();
             return array(
@@ -80,10 +80,10 @@ class ProductServiceImplement implements ProductService
      */
     public function getProductsByAvailability(string $availability, int $offset = null, int $limit = null, int $paginate = null): array
     {
-        $products = Product::{$availability}()->whereHas('productDetails', fn ($q) => $q->inStock())
+        $products = Product::{$availability}()->whereHas('productItems', fn ($q) => $q->inStock())
             ->with(['productImages:product_id,id,image', 'productBrand:id,name'])
-            ->withMin('productDetails', 'price')
-            ->withMax('productDetails', 'price');
+            ->withMin('productItems', 'price')
+            ->withMax('productItems', 'price');
         if ($offset !== null && $limit !== null) {
             $productsLimit = $products->offset($offset)->limit($limit)->get();
             return array(
@@ -123,10 +123,10 @@ class ProductServiceImplement implements ProductService
      */
     public function getProductsPromo(int $offset = null, int $limit = null, int $paginate = null): array
     {
-        $products = Product::promo()->whereHas('productDetails', fn ($q) => $q->inStock())
+        $products = Product::promo()->whereHas('productItems', fn ($q) => $q->inStock())
             ->with(['productImages:product_id,id,image', 'productBrand:id,name'])
-            ->withMin('productDetails', 'price')
-            ->withMax('productDetails', 'price');
+            ->withMin('productItems', 'price')
+            ->withMax('productItems', 'price');
         if ($offset !== null && $limit !== null) {
             $productsLimit = $products->offset($offset)->limit($limit)->get();
             return array(
@@ -166,10 +166,10 @@ class ProductServiceImplement implements ProductService
      */
     public function getProductsByBrand(array $brandIds, int $offset = null, int $limit = null, int $paginate = null): array
     {
-        $products = Product::withBrand($brandIds)->whereHas('productDetails', fn ($q) => $q->inStock())
+        $products = Product::withBrand($brandIds)->whereHas('productItems', fn ($q) => $q->inStock())
             ->with(['productImages:product_id,id,image', 'productBrand:id,name'])
-            ->withMin('productDetails', 'price')
-            ->withMax('productDetails', 'price');
+            ->withMin('productItems', 'price')
+            ->withMax('productItems', 'price');
         if ($offset !== null && $limit !== null) {
             $productsLimit = $products->offset($offset)->limit($limit)->get();
             return array(
@@ -210,8 +210,8 @@ class ProductServiceImplement implements ProductService
         $product = $product?->load([
             'productBrand:id,name',
             'productImages:product_id,id,image',
-            'productDetails'
-        ])->loadMin('productDetails', 'price')->loadMax('productDetails', 'price');
+            'productItems'
+        ])->loadMin('productItems', 'price')->loadMax('productItems', 'price');
         return array(
             'code' => $product ? 200 : 404,
             'data' => $product
@@ -229,7 +229,7 @@ class ProductServiceImplement implements ProductService
     {
         $ignoredColumns = [''];
         $products = Product::join('product_brands', 'product_brands.id', 'products.product_brand_id')
-            ->join('product_details', 'product_details.product_id', 'products.id')
+            ->join('product_items', 'product_items.product_id', 'products.id')
             ->join('product_images', 'product_images.product_id', 'products.id')
             ->distinct()
             ->where(function ($query) use ($criteria, $ignoredColumns) {
@@ -246,9 +246,9 @@ class ProductServiceImplement implements ProductService
                     }
                 }
             })
-            ->where('product_details.stock', '>', 0)
-            ->withMin('productDetails', 'price')
-            ->withMax('productDetails', 'price')
+            ->where('product_items.stock', '>', 0)
+            ->withMin('productItems', 'price')
+            ->withMax('productItems', 'price')
             ->with(['productBrand:id,name', 'productImages:product_id,image']);
         if ($offset !== null && $limit !== null) {
             $productsLimit = $products->offset($offset)->limit($limit)->get();
@@ -274,7 +274,7 @@ class ProductServiceImplement implements ProductService
     {
         $ignoredColumns = ['products.ispromo'];
         $products = Product::promo()->join('product_brands', 'product_brands.id', 'products.product_brand_id')
-            ->join('product_details', 'product_details.product_id', 'products.id')
+            ->join('product_items', 'product_items.product_id', 'products.id')
             ->join('product_images', 'product_images.product_id', 'products.id')
             ->distinct()
             ->where(function ($query) use ($criteria, $ignoredColumns) {
@@ -284,9 +284,9 @@ class ProductServiceImplement implements ProductService
                     $query->orWhere($column, 'LIKE', '%' . $criteria['q'] . '%');
                 }
             })
-            ->where('product_details.stock', '>', 0)
-            ->withMin('productDetails', 'price')
-            ->withMax('productDetails', 'price')
+            ->where('product_items.stock', '>', 0)
+            ->withMin('productItems', 'price')
+            ->withMax('productItems', 'price')
             ->with(['productBrand:id,name', 'productImages:product_id,image']);
         if ($paginate !== null) {
             $productsPagination = $products->simplePaginate($paginate)->withQueryString();
@@ -321,7 +321,7 @@ class ProductServiceImplement implements ProductService
     {
         $ignoredColumns = ['products.availability'];
         $products = Product::{$availability}()->join('product_brands', 'product_brands.id', 'products.product_brand_id')
-            ->join('product_details', 'product_details.product_id', 'products.id')
+            ->join('product_items', 'product_items.product_id', 'products.id')
             ->join('product_images', 'product_images.product_id', 'products.id')
             ->distinct()
             ->where(function ($query) use ($criteria, $ignoredColumns) {
@@ -338,9 +338,9 @@ class ProductServiceImplement implements ProductService
                     }
                 }
             })
-            ->where('product_details.stock', '>', 0)
-            ->withMin('productDetails', 'price')
-            ->withMax('productDetails', 'price')
+            ->where('product_items.stock', '>', 0)
+            ->withMin('productItems', 'price')
+            ->withMax('productItems', 'price')
             ->with(['productBrand:id,name', 'productImages:product_id,image']);
         if ($paginate !== null) {
             $productsPagination = $products->simplePaginate($paginate)->withQueryString();
@@ -375,7 +375,7 @@ class ProductServiceImplement implements ProductService
     {
         $ignoredColumns = ['products_brands.name'];
         $products = Product::withBrand($brandIds)->join('product_brands', 'product_brands.id', 'products.product_brand_id')
-            ->join('product_details', 'product_details.product_id', 'products.id')
+            ->join('product_items', 'product_items.product_id', 'products.id')
             ->join('product_images', 'product_images.product_id', 'products.id')
             ->distinct()
             ->where(function ($query) use ($criteria, $ignoredColumns) {
@@ -392,9 +392,9 @@ class ProductServiceImplement implements ProductService
                     }
                 }
             })
-            ->where('product_details.stock', '>', 0)
-            ->withMin('productDetails', 'price')
-            ->withMax('productDetails', 'price')
+            ->where('product_items.stock', '>', 0)
+            ->withMin('productItems', 'price')
+            ->withMax('productItems', 'price')
             ->with(['productBrand:id,name', 'productImages:product_id,image']);
         if ($paginate !== null) {
             $productsPagination = $products->simplePaginate($paginate)->withQueryString();

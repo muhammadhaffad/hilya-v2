@@ -16,13 +16,13 @@ class OrderDetail extends Model
         return $this->belongsTo(Order::class);
     }
 
-    public function productDetail()
+    public function productItem()
     {
-        return $this->belongsTo(ProductDetail::class);
+        return $this->belongsTo(ProductItem::class);
     }
 
     public function product()
     {
-        return $this->hasOneThrough(Product::class, ProductDetail::class, 'id', 'id', 'product_detail_id', 'product_id');
+        return $this->hasOneThrough(Product::class, ProductItem::class, 'id', 'id', 'product_item_id', 'product_id');
     }
 }

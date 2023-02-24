@@ -9,19 +9,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
-class ProductDetail
+class ProductItem
 {
     public static function getProduct($product) {
         return $product
         ->load([
             'productBrand:id,name',
             'productImages:product_id,id,image',
-            'productDetails'
+            'productItems'
         ])->loadMin(
-            'productDetails',
+            'productItems',
             'price'
         )->loadMax(
-            'productDetails',
+            'productItems',
             'price'
         );
     }

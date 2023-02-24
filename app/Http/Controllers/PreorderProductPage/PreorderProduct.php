@@ -9,16 +9,16 @@ class PreorderProduct
 {
     public static function getPreorderProducts() {
         return Product::preorder()
-            ->whereHas('productDetails', function ($query) {
+            ->whereHas('productItems', function ($query) {
                 $query->inStock();
             })
             ->with([
                 'productBrand:id,name',
                 'productImages:product_id,id,image'
             ])->withMin(
-                'productDetails', 'price'
+                'productItems', 'price'
             )->withMax(
-                'productDetails', 'price'
+                'productItems', 'price'
             );
     }
 }

@@ -12,17 +12,17 @@ class Payment
     private static function checkProductUnavailable($order)
     {
         return $order->join('order_details', 'order_id', 'orders.id')
-            ->join('product_details', function ($join) {
-                $join->on('product_details.id', '=', 'order_details.product_detail_id')
-                    ->on('product_details.stock', '<', 'order_details.qty');
+            ->join('product_items', function ($join) {
+                $join->on('product_items.id', '=', 'order_details.product_item_id')
+                    ->on('product_items.stock', '<', 'order_details.qty');
             })->get();
     }
     private static function calcSubTotalOrderItems($order)
     {
         return $order->join('order_details', 'order_id', 'orders.id')
-            ->join('product_details', function ($join) {
-                $join->on('product_details.id', '=', 'order_details.product_detail_id');
-            })->select(DB::raw('sum(order_details.qty * product_details.price) as subtotal'))->first()->subtotal;
+            ->join('product_items', function ($join) {
+                $join->on('product_items.id', '=', 'order_details.product_item_id');
+            })->select(DB::raw('sum(order_details.qty * product_items.price) as subtotal'))->first()->subtotal;
     }
     public static function processPayment($service, $bank)
     {

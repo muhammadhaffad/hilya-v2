@@ -21,10 +21,10 @@ class OrderDetailFactory extends Factory
         ];
     }
 
-    public function productDetail($max) {
+    public function productItem($max) {
         return $this->state(function (array $attributes) use ($max) {
             return [
-                'product_detail_id' => fake()->unique(true)->numberBetween(1, $max)
+                'product_item_id' => fake()->unique(true)->numberBetween(1, $max)
             ];
         });
     }

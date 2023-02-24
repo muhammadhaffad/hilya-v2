@@ -8,17 +8,17 @@ use Illuminate\Http\Request;
 class Slide
 {
     public static function getSlides() {
-        return Product::whereHas('productDetails', function ($query) {
+        return Product::whereHas('productItems', function ($query) {
                 $query->inStock();
             })->limit(6)
             ->with([
                 'productBrand:id,name',
                 'productImages:product_id,id,image'
             ])->withMin(
-                'productDetails',
+                'productItems',
                 'price'
             )->withMax(
-                'productDetails',
+                'productItems',
                 'price'
             );
     }

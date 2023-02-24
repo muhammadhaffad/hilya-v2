@@ -8,14 +8,14 @@ use Illuminate\Http\Request;
 class ReadyProduct
 {
     public static function getReadyProducts() {
-        return Product::ready()->whereHas('productDetails', fn ($q) => $q->inStock())
+        return Product::ready()->whereHas('productItems', fn ($q) => $q->inStock())
             ->with([
                 'productBrand:id,name',
                 'productImages:product_id,id,image'
             ])->withMin(
-                'productDetails', 'price'
+                'productItems', 'price'
             )->withMax(
-                'productDetails', 'price'
+                'productItems', 'price'
             );
     }
 }

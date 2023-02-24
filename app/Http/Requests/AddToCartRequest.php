@@ -24,7 +24,7 @@ class AddToCartRequest extends FormRequest
     public function rules()
     {
         return [
-            'product_detail_id' => 'required|numeric',
+            'product_item_id' => 'required|numeric',
             'qty' => 'required|numeric'
         ];
     }
@@ -32,7 +32,7 @@ class AddToCartRequest extends FormRequest
     public function attributes()
     {
         return [
-            'product_detail_id' => 'produk',
+            'product_item_id' => 'produk',
             'qty' => 'jumlah'
         ];
     }

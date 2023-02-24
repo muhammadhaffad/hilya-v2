@@ -14,14 +14,14 @@ class ProductSearch
             'products.description',
             'products.ispromo', 
             'product_brands.name',
-            'product_details.gender',
-            'product_details.age',
-            'product_details.color',
-            'product_details.fabric',
-            'product_details.model'
+            'product_items.gender',
+            'product_items.age',
+            'product_items.color',
+            'product_items.fabric',
+            'product_items.model'
         ];
         return Product::ready()->join('product_brands', 'product_brands.id', 'products.product_brand_id')
-        ->join('product_details', 'product_details.product_id', 'products.id')
+        ->join('product_items', 'product_items.product_id', 'products.id')
         ->join('product_images', 'product_images.product_id', 'products.id')
         ->distinct()
         ->where(function ($query) use ($keyword, $columns) {
@@ -38,9 +38,9 @@ class ProductSearch
                 }
             }
         })
-        ->where('product_details.stock', '>', 0)
-        ->withMin('productDetails', 'price')
-        ->withMax('productDetails', 'price')
+        ->where('product_items.stock', '>', 0)
+        ->withMin('productItems', 'price')
+        ->withMax('productItems', 'price')
         ->with(['productBrand:id,name', 'productImages:product_id,image']);
     }
 }

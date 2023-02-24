@@ -35,9 +35,9 @@ class CheckoutServiceTest extends TestCase
     {
         $q = clone $query;
         return $q->join('order_details', 'order_id', 'orders.id')
-            ->join('product_details', function ($join) {
-                $join->on('product_details.id', '=', 'order_details.product_detail_id');
-            })->select(DB::raw('sum(order_details.qty * product_details.price) as subtotal'))->first()->subtotal;
+            ->join('product_items', function ($join) {
+                $join->on('product_items.id', '=', 'order_details.product_item_id');
+            })->select(DB::raw('sum(order_details.qty * product_items.price) as subtotal'))->first()->subtotal;
     }
 
     /**
