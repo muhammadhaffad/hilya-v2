@@ -13,19 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('product_items', function (Blueprint $table) {
+        Schema::create('product_origins', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained();
-            $table->string('gender');
-            $table->string('age');
-            $table->string('size');
-            $table->string('color');
-            $table->integer('price');
-            $table->integer('weight')->default(100);
-            $table->integer('discount')->default(0);
+            $table->string('name');
             $table->integer('stock');
-            $table->string('note_bene')->nullable();
-            $table->boolean('is_bundle')->default(false);
             $table->timestamps();
         });
     }
@@ -37,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('product_items');
+        Schema::dropIfExists('product_origins');
     }
 };

@@ -21,11 +21,7 @@ class ProductItemFactory extends Factory
             'age' => collect(['anak-anak', 'remaja', 'dewasa'])->random(),
             'size' => collect(['1', '3', '6', '9', 'M', 'L', 'XL'])->random(),
             'color' => fake()->colorName(),
-            'fabric' => fake()->word(),
-            'model' => fake()->words(2, true),
             'price' => rand(120000,250000),
-            'weight' => 100,
-            'discount' => 0,
             'stock' => rand(5, 50)
         ];
     }

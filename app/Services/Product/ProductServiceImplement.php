@@ -21,9 +21,7 @@ class ProductServiceImplement implements ProductService
         'product_brands.name',
         'product_items.gender',
         'product_items.age',
-        'product_items.color',
-        'product_items.fabric',
-        'product_items.model'
+        'product_items.color'
     ];
 
     /**

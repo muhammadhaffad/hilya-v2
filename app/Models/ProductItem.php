@@ -58,4 +58,8 @@ class ProductItem extends Model
     {
         return $query->orderBy('price', 'asc');
     }
+
+    public function productOrigins() {
+        return $this->belongsToMany(ProductOrigin::class, 'product_relations');
+    }
 }

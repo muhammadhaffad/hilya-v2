@@ -14,7 +14,7 @@ class MidtransPaymentServiceImplement implements PaymentService
             return array();
         $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']]);
         $itemDetails = $checkout->first()->orderItems()->with([
-            'productItem:id,product_id,gender,age,size,model,fabric,price',
+            'productItem:id,product_id,gender,age,size,price,note_bene,is_bundle',
             'productItem.product:id,product_brand_id,name',
             'productItem.product.productBrand:id,name'
         ])->get(['qty', 'product_item_id'])->map(function ($item, $key) {

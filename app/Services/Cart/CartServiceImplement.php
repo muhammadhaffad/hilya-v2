@@ -86,7 +86,7 @@ class CartServiceImplement implements CartService
         $cart = Order::where([['user_id', auth()->user()->id], ['status', 'cart']])->first()
             ?->load([
                 'orderItems:id,order_id,product_item_id,qty',
-                'orderItems.productItem:id,product_id,gender,age,size,color,fabric,model,price,weight',
+                'orderItems.productItem:id,product_id,gender,age,size,color,price,weight,note_bene,is_bundle',
                 'orderItems.productItem.product:id,product_brand_id,name',
                 'orderItems.productItem.product.productImage:id,product_images.product_id,image',
                 'orderItems.productItem.product.productBrand:id,name,image'
