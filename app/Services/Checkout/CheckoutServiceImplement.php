@@ -287,9 +287,6 @@ class CheckoutServiceImplement implements CheckoutService
                     'status' => $transaction['transaction_status'],
                     'transactiontime' => $transaction['transaction_time']
                 ]);
-                foreach ($checkout->first()->orderItems()->get()->all() as $item) {
-                    $item->productItem()->decrement('stock', $item->qty);
-                }
                 $codeOrder = $checkout->first()->code;
                 $productsPromo = $checkout->first()->productItems()->whereHas('product', fn($q) => $q->where('ispromo',1))->get(['product_items.id','price', 'discount'])->toJson();
                 /* tidak membuat kondisi where status = checkout berubah menjadi status = pending*/
