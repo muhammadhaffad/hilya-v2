@@ -8,6 +8,20 @@ use GuzzleHttp\Client;
 
 class MidtransPaymentServiceImplement implements PaymentService
 {
+    private function calcDiscount(): int
+    {
+        $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']])->first()->load('orderItems.productItem.product');
+        return -(function() use ($checkout) {
+            $total = 0;
+            foreach ($checkout->orderItems as $orderItem) {
+                if ($orderItem->productItem->product->ispromo) {
+                    $total += $orderItem->qty * (int)($orderItem->productItem->price*$orderItem->productItem->discount/100);
+                }
+            }
+            return $total;
+        })();
+    }
+
     public function sendTransaction(string $bank): array
     {
         if (!in_array($bank, ['bni', 'bri']))
@@ -37,6 +51,12 @@ class MidtransPaymentServiceImplement implements PaymentService
             'quantity' => 1,
             'name' => 'biaya ongkir'
         ));
+        array_push($itemDetails, [
+            'id' => 'D01',
+            'price' => $this->calcDiscount(),
+            'quantity' => 1,
+            'name' => 'Discount'
+        ]);
         $transactionDetails = array(
             'order_id' => $checkout->first()->code,
             'gross_amount' => (int) $checkout->first()->grandtotal

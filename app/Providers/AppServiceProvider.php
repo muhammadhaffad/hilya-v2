@@ -4,6 +4,10 @@ namespace App\Providers;
 
 use App\Repositories\Product\ProductRepository;
 use App\Repositories\Product\ProductRepositoryImplement;
+use App\Services\Cart\CartService;
+use App\Services\Cart\CartServiceImplement;
+use App\Services\Checkout\CheckoutService;
+use App\Services\Checkout\CheckoutServiceImplement;
 use App\Services\Order\OrderService;
 use App\Services\Order\OrderServiceImplement;
 use App\Services\Payment\MidtransPaymentServiceImplement;
@@ -30,6 +34,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ProductBrandService::class, ProductBrandImplement::class);
         $this->app->bind(ShippingCostService::class, RajaOngkirShippingCostServiceImplement::class);
         $this->app->bind(PaymentService::class, MidtransPaymentServiceImplement::class);
+        $this->app->bind(CartService::class, CartServiceImplement::class);
+        $this->app->bind(CheckoutService::class, CheckoutServiceImplement::class);
     }
 
     /**

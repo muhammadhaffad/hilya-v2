@@ -10,6 +10,7 @@ class Order extends Model
     use HasFactory;
 
     protected $guarded = ['id'];
+    protected $casts = ['custom_properties' => 'array'];
 
     public function user()
     {

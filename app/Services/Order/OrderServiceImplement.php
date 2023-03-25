@@ -6,6 +6,20 @@ use App\Models\Order;
 
 class OrderServiceImplement implements OrderService
 {
+    private function calcDiscount($code): int
+    {
+        $order = Order::where('code', $code)->first()->load('orderItems.productItem');
+        $total = 0;
+        $customProps = collect($order->custom_properties);
+        foreach ($order->orderItems as $orderItem) {
+            $prop = $customProps->where('id', $orderItem->productItem->id)->first();
+            if ($prop) {
+                $total += $orderItem->qty * (int)($prop['price']*$prop['discount']/100);
+            }
+        }
+        return $total;
+    }
+
     /**
      * getOrders
      *
@@ -17,15 +31,23 @@ class OrderServiceImplement implements OrderService
         $orders = Order::where('user_id', $userId)->withoutStatus(['cart', 'checkout'])
             ->whereDate('created_at', '>=', now()->subDays(30))
             ->with([
-                'productItems.product:id,product_brand_id,name',
-                'productItems.product.productImage',
-                'productItems.product.productBrand',
+                'orderItems.productItem.product:id,product_brand_id,name',
+                'orderItems.productItem.product.productImage',
+                'orderItems.productItem.product.productBrand',
                 'payment:id,order_id,transactiontime,settlementtime,amount'
             ])->orderBy('created_at', 'desc')->get();
-        return array(
-            'code' => $orders->all() ? 200 : 404,
-            'data' => $orders->all()
-        );
+        if($orders) {
+            return [
+                'code' => 200,
+                'message' => 'Sukses mendapatkan data order',
+                'data' => $orders
+            ];
+        } else {
+            return [
+                'code' => 404,
+                'message' => 'Tidak ada data'
+            ];
+        };
     }
 
     /**
@@ -44,10 +66,19 @@ class OrderServiceImplement implements OrderService
             'shipping.shippingAddress',
             'payment'
         ])->first();
-        return array(
-            'code' => $order ? 200 : 404,
-            'data' => $order
-        );
+        $order['total_discount'] = $this->calcDiscount($code);
+        if ($order) {
+            return [
+                'code' => 200,
+                'message' => 'Sukses mendapatkan detail order',
+                'data' => $order
+            ];
+        } else {
+            return [
+                'code' => 404,
+                'message' => 'Tidak ada data'
+            ];
+        }
     }
 
     /**
@@ -67,37 +98,47 @@ class OrderServiceImplement implements OrderService
             ->join('product_brands', 'product_brands.id', 'products.product_brand_id')
             ->select('orders.*')
             ->distinct();
-        if ($criteria['search']) {
+        if (@$criteria['search']) {
+            
             $orders->where(function ($query) use ($criteria) {
                 $query->where('orders.code', 'LIKE', '%' . $criteria['search'] . '%')
                     ->orWhere('product_items.gender', 'LIKE', '%' . $criteria['search'] . '%')
                     ->orWhere('product_items.age', 'LIKE', '%' . $criteria['search'] . '%')
-                    ->orWhere('product_items.model', 'LIKE', '%' . $criteria['search'] . '%')
                     ->orWhere('product_brands.name', 'LIKE', '%' . $criteria['search'] . '%')
                     ->orWhere('products.name', 'LIKE', '%' . $criteria['search'] . '%');
             });
         }
-        if ($criteria['status']) {
+        if (@$criteria['status']) {
+            
             $orders->where(function ($query) use ($criteria) {
                 $query->withStatus([$criteria['status']]);
             });
         }
-        if ($criteria['start_date'] && $criteria['end_date']) {
+        if (@$criteria['start_date'] !== null && @$criteria['end_date'] !== null) {
+            
             $orders->where(function ($query) use ($criteria) {
                 $query->whereBetween('orders.created_at', [$criteria['start_date'], $criteria['end_date']]);
             });
         } else {
             $orders->where(fn ($q) => $q->whereDate('orders.created_at', '>=', now()->subDays(30)));
         }
-        $orders->with([
+        $orders = $orders->with([
             'productItems.product:id,product_brand_id,name',
             'productItems.product.productImage',
             'productItems.product.productBrand',
             'payment:id,order_id,transactiontime,settlementtime,amount'
         ])->orderBy('created_at', 'desc')->get();
-        return array(
-            'code' => $orders->all() ? 200 : 404,
-            'data' => $orders->all()
-        );
+        if ($orders) {
+            return [
+                'code' => 200,
+                'message' => 'Sukses mendapatkan data order',
+                'data' => $orders
+            ];
+        } else {
+            return [
+                'code' => 404,
+                'message' => 'Tidak ada data'
+            ];
+        }
     }
 }

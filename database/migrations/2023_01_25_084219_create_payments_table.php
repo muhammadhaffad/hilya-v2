@@ -21,8 +21,8 @@ return new class extends Migration
             $table->string('vanumber');
             $table->integer('amount');
             $table->string('status');
-            $table->date('transactiontime');
-            $table->date('settlementtime')->nullable();
+            $table->dateTime('transactiontime');
+            $table->dateTime('settlementtime')->nullable();
             $table->timestamps();
         });
     }

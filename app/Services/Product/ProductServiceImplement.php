@@ -210,10 +210,18 @@ class ProductServiceImplement implements ProductService
             'productImages:product_id,id,image',
             'productItems'
         ])->loadMin('productItems', 'price')->loadMax('productItems', 'price');
-        return array(
-            'code' => $product ? 200 : 404,
-            'data' => $product
-        );
+        if ($product) {
+            return [
+                'code' => 200,
+                'message' => 'Sukses mendapatkan detail produk',
+                'data' => $product
+            ];
+        } else {
+            return [
+                'code' => 404,
+                'message' => 'Tidak ada data'
+            ];
+        }
     }
     /**
      * searchProducts

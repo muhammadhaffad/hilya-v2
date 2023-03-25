@@ -5,10 +5,12 @@ use App\Models\Product;
 
 interface CartService 
 {
-    public function getCart() : array;
-    public function addQty(int $orderDetailId) : array;
-    public function subQty(int $orderDetailId) : array;
-    public function removeItem(int $orderDetailId) : array;
-    public function addToCart(Product $product, int $productDetailId, int $qty) : array;
-    public function checkoutCart() : array;
+    public function hasCheckout(): mixed;
+    public function checkUnvailableProducts(): mixed;
+    public function getCart() : mixed;
+    public function addQty(int $orderDetailId) : mixed;
+    public function subQty(int $orderDetailId) : mixed;
+    public function removeItem(int $orderDetailId) : mixed;
+    public function addToCart(Product $product, array $attr) : mixed;
+    public function checkoutCart() : mixed;
 }
