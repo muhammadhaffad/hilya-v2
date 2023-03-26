@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::table('payments', function (Blueprint $table) {
             $table->after('id', function (Blueprint $table) {
-                $table->uuid('code');
+                $table->uuid('code_order');
             });
         });
     }
@@ -28,7 +28,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('payments', function (Blueprint $table) {
-            $table->dropColumn('order_id');
+            $table->dropColumn('code_order');
         });
     }
 };
