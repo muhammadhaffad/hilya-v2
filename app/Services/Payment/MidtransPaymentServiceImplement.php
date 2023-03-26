@@ -42,7 +42,7 @@ class MidtransPaymentServiceImplement implements PaymentService
         })->toArray();
         $itemDetails[] = [
             'id' => 'shipping-cost',
-            'price' => $chekcoutInformation->shipping->shippingcost,
+            'price' => 68000, //$chekcoutInformation->shipping->shippingcost,
             'quantity' => 1,
             'name' => 'biaya ongkir'
         ];
@@ -53,8 +53,8 @@ class MidtransPaymentServiceImplement implements PaymentService
             'name' => 'Discount'
         ];
         $transactionDetails = [
-            'order_id' => $chekcoutInformation->code,
-            'gross_amount' => (int) $chekcoutInformation->grandtotal
+            'order_id' => \Str::uuid()->toString(),//$chekcoutInformation->code,
+            'gross_amount' => $chekcoutInformation->subtotal + 68000
         ];
         $client = new Client([
             'base_uri' => env('MIDTRANS_URL'),
