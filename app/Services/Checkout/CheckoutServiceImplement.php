@@ -243,13 +243,11 @@ class CheckoutServiceImplement implements CheckoutService
             $totalWeight = $checkoutInformation->totalweight;
             $cost = $this->shippingCostService->getCosts(222, $cityId, $totalWeight, $courier);
             if (@$cost['services'][$service]) {
-                $checkoutInformation->shipping->update([
-                    'courier' => $cost['courier'],
-                    'service' => $service,
-                    'shippingcost' => $cost['services'][$service]
-                ]);
+                $checkoutInformation->shipping->courier = $cost['courier'];
+                $checkoutInformation->shipping->courier = $service;
+                $checkoutInformation->shipping->service = $cost['services'][$service];
+                $checkoutInformation->shipping->save();
             } else {
-                DB::rollBack();
                 return [
                     'code' => 422,
                     'message' => 'Data yang diberikan tidak valid',
@@ -259,12 +257,10 @@ class CheckoutServiceImplement implements CheckoutService
                     ]
                 ];
             }
-            $checkoutInformation->update([
-                'grandtotal' => $checkoutInformation->subtotal + $cost['services'][$service] - $this->calcDiscount()
-            ]);
+            $checkoutInformation->grandtotal = $checkoutInformation->subtotal + $cost['services'][$service] - $this->calcDiscount();
+            $checkoutInformation->save();
             $transaction = $this->paymentService->sendTransaction($checkoutInformation, $bank);
             if ($transaction['status_code'] != 201) {
-                DB::rollBack();
                 return [
                     'code' => 422,
                     'message' => 'Data yang diberikan tidak valid',
@@ -282,14 +278,30 @@ class CheckoutServiceImplement implements CheckoutService
                     'status' => $transaction['transaction_status'],
                     'transactiontime' => $transaction['transaction_time']
                 ]);
+                foreach ($checkoutInformation->orderItems as $orderItem ) {
+                    if ($orderItem->productItem->is_bundle) {
+                        foreach ($orderItem->productItem->productOrigins as $productOrigin) {
+                            $productOrigin->stock -= $orderItem->qty;
+                            $productOrigin->save();
+                        }
+                    } 
+                }
+                foreach ($checkoutInformation->orderItems as $orderItem ) {
+                    if ($orderItem->productItem->is_bundle) {
+                        $orderItem->productItem->stock = $orderItem->productItem->productOrigins->min('stock');
+                        $orderItem->productItem->save();
+                    } else {
+                        $orderItem->productItem->stock -= $orderItem->qty;
+                        $orderItem->productItem->save();
+                    }
+                }
                 $productsPromo = $checkoutInformation->productItems
                     ->filter( fn($item) => $item->product->ispromo == 1)
                     ->map(fn($item) => ['id'=>$item->id, 'price'=>$item->price, 'discount'=>$item->discount])
                     ->toJson();
-                $checkoutInformation->update([
-                    'status' => $transaction['transaction_status'],
-                    'custom_properties' => $productsPromo
-                ]);
+                $checkoutInformation->status = $transaction['transaction_status'];
+                $checkoutInformation->custom_properties = $productsPromo;
+                $checkoutInformation->save();
                 DB::commit();
                 return [
                     'code' => '201',
