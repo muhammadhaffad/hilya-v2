@@ -294,6 +294,14 @@ class CheckoutServiceImplement implements CheckoutService
                     'status' => $transaction['transaction_status'],
                     'custom_properties' => $productsPromo
                 ]);
+                DB::commit();
+                return [
+                    'code' => '201',
+                    'message' => 'Berhasil membuat pesanan, silahkan melakukan pembayaran',
+                    'data' => [
+                        'code' => $codeOrder
+                    ]
+                ];
             } else {
                 DB::rollBack();
                 return array(
@@ -305,14 +313,6 @@ class CheckoutServiceImplement implements CheckoutService
             DB::rollBack();
             throw $e;
         }
-        DB::commit();
-        return [
-            'code' => '201',
-            'message' => 'Berhasil membuat pesanan, silahkan melakukan pembayaran',
-            'data' => [
-                'code' => $codeOrder
-            ]
-        ];
     }
     /**
      * backToCart
