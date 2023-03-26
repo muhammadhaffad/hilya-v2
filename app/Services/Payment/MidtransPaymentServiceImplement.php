@@ -26,7 +26,7 @@ class MidtransPaymentServiceImplement implements PaymentService
     {
         if (!in_array($bank, ['bni', 'bri']))
             return [];
-        // $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']]);
+        $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']]);
         // $itemDetails = $checkout->first()->orderItems()->with([
         //     'productItem:id,product_id,gender,age,size,price,note_bene,is_bundle',
         //     'productItem.product:id,product_brand_id,name',
