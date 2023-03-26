@@ -234,7 +234,6 @@ class CheckoutServiceImplement implements CheckoutService
                     'shippingcost' => $cost['services'][$service]
                 ]);
             } else {
-                DB::rollBack();
                 return [
                     'code' => 422,
                     'message' => 'Data yang diberikan tidak valid',
@@ -289,7 +288,6 @@ class CheckoutServiceImplement implements CheckoutService
                 //     }
                 // }
                 $productsPromo = $checkout->first()->productItems()->whereHas('product', fn($q) => $q->where('ispromo',1))->get(['product_items.id','price', 'discount'])->toJson();
-                /* tidak membuat kondisi where status = checkout berubah menjadi status = pending*/
                 $checkout->clone()->update([
                     'status' => $transaction['transaction_status'],
                     'custom_properties' => $productsPromo
