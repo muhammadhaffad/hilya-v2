@@ -274,7 +274,6 @@ class CheckoutServiceImplement implements CheckoutService
                     'status' => $transaction['transaction_status'],
                     'custom_properties' => $productsPromo
                 ]);
-                DB::commit();
             } else {
                 DB::rollBack();
                 return array(
@@ -286,37 +285,32 @@ class CheckoutServiceImplement implements CheckoutService
             DB::rollBack();
             throw $e;
         }
-        DB::beginTransaction();
-        try {
-            $checkout = Order::where('code', $codeOrder);
-            $orderItems = $checkout->first()->load('orderItems.productItem.productOrigins')->orderItems;
-            foreach ($orderItems as $orderItem ) {
-                if ($orderItem->productItem->is_bundle) {
-                    $productOriginIds = $orderItem->productItem->productOrigins->pluck('id');
-                    ProductOrigin::whereIn('id', $productOriginIds)->decrement('stock', $orderItem->qty);
-                } 
-            }
-            $orderItems = $checkout->first()->load('orderItems.productItem.productOrigins')->orderItems;
-            foreach ($orderItems as $orderItem ) {
-                if ($orderItem->productItem->is_bundle) {
-                    $orderItem->productItem->update([
-                        'stock' => $orderItem->productItem->productOrigins->min('stock')
-                    ]);
-                } else {
-                    $orderItem->productItem->decrement('stock', $orderItem->qty);
-                }
-            }
-            DB::commit();
-            return [
-                'code' => '201',
-                'message' => 'Berhasil membuat pesanan, silahkan melakukan pembayaran',
-                'data' => [
-                    'code' => $codeOrder
-                ]
-            ];
-        } catch (\Exception $th) {
-            throw $th;
+        DB::commit();
+        $checkout = Order::where('code', $codeOrder);
+        $orderItems = $checkout->first()->load('orderItems.productItem.productOrigins')->orderItems;
+        foreach ($orderItems as $orderItem ) {
+            if ($orderItem->productItem->is_bundle) {
+                $productOriginIds = $orderItem->productItem->productOrigins->pluck('id');
+                ProductOrigin::whereIn('id', $productOriginIds)->decrement('stock', $orderItem->qty);
+            } 
         }
+        $orderItems = $checkout->first()->load('orderItems.productItem.productOrigins')->orderItems;
+        foreach ($orderItems as $orderItem ) {
+            if ($orderItem->productItem->is_bundle) {
+                $orderItem->productItem->update([
+                    'stock' => $orderItem->productItem->productOrigins->min('stock')
+                ]);
+            } else {
+                $orderItem->productItem->decrement('stock', $orderItem->qty);
+            }
+        }
+        return [
+            'code' => '201',
+            'message' => 'Berhasil membuat pesanan, silahkan melakukan pembayaran',
+            'data' => [
+                'code' => $codeOrder
+            ]
+        ];
     }
     /**
      * backToCart
