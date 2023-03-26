@@ -54,7 +54,7 @@ class MidtransPaymentServiceImplement implements PaymentService
         ];
         $transactionDetails = [
             'order_id' => \Str::uuid()->toString(), //$x['code'], //$chekcoutInformation->code,
-            'gross_amount' => 242625*2+68000 //$x['grandtotal'] //(int) $chekcoutInformation->grandtotal
+            'gross_amount' => $chekcoutInformation->subtotal+68000 //$x['grandtotal'] //(int) $chekcoutInformation->grandtotal
         ];
         $client = new Client([
             'base_uri' => env('MIDTRANS_URL'),
