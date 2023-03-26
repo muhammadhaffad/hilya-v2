@@ -247,6 +247,7 @@ class CheckoutServiceImplement implements CheckoutService
                     ]);
                 }
             }
+            DB::commit();
             if (@$cost['services'][$service]) {
                 $checkout->first()->shipping()->update([
                     'courier' => $cost['courier'],
