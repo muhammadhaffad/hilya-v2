@@ -278,6 +278,7 @@ class CheckoutServiceImplement implements CheckoutService
                 return [
                     'id' => 'product-detail.' . $item->productItem->id,
                     'price' => (int) $item->productItem->price,
+                    'stock' => (int) $item->productItem->stock,
                     'quantity' => (int) $item->qty,
                     'name' => "($brandName) $productName $gender $age ($size) $model"
                 ];
