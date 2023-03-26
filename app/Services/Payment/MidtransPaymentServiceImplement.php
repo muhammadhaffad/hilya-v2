@@ -53,7 +53,7 @@ class MidtransPaymentServiceImplement implements PaymentService
         ];
         $itemDetails[] = [
             'id' => 'D01',
-            'price' => $this->calcDiscount(),
+            'price' => 0,
             'quantity' => 1,
             'name' => 'Discount'
         ];
