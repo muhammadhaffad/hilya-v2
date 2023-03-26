@@ -263,7 +263,7 @@ class CheckoutServiceImplement implements CheckoutService
             $checkout->clone()->update([
                 'grandtotal' => $checkout->first()->subtotal + $cost['services'][$service] - $this->calcDiscount()
             ]);
-            DB::commit();
+            // DB::commit();
             $itemDetails = $checkout->first()->orderItems()->with([
                 'productItem:id,product_id,gender,age,size,price,note_bene,is_bundle',
                 'productItem.product:id,product_brand_id,name',
@@ -298,7 +298,7 @@ class CheckoutServiceImplement implements CheckoutService
                 'order_id' => $checkout->first()->code,
                 'gross_amount' => (int) $checkout->first()->grandtotal
             ];
-
+            dd($itemDetails);
             /* $itemDetails = [
                 [
                     'id' => 'test',
