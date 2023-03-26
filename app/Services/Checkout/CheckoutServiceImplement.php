@@ -263,8 +263,7 @@ class CheckoutServiceImplement implements CheckoutService
             $checkout->clone()->update([
                 'grandtotal' => $checkout->first()->subtotal + $cost['services'][$service] - $this->calcDiscount()
             ]);
-
-            $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']]);
+            
             $itemDetails = $checkout->first()->orderItems()->with([
                 'productItem:id,product_id,gender,age,size,price,note_bene,is_bundle',
                 'productItem.product:id,product_brand_id,name',
