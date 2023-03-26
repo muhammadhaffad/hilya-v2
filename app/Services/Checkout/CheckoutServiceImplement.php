@@ -263,8 +263,8 @@ class CheckoutServiceImplement implements CheckoutService
             $checkout->clone()->update([
                 'grandtotal' => $checkout->first()->subtotal + $cost['services'][$service] - $this->calcDiscount()
             ]);
-            
-            $itemDetails = $checkout->first()->orderItems()->with([
+
+            /* $itemDetails = $checkout->first()->orderItems()->with([
                 'productItem:id,product_id,gender,age,size,price,note_bene,is_bundle',
                 'productItem.product:id,product_brand_id,name',
                 'productItem.product.productBrand:id,name'
@@ -275,29 +275,43 @@ class CheckoutServiceImplement implements CheckoutService
                 $age = $item->productItem->age;
                 $size = $item->productItem->size;
                 $model = $item->productItem->model;
-                return array(
+                return [
                     'id' => 'product-detail.' . $item->productItem->id,
                     'price' => (int) $item->productItem->price,
                     'quantity' => (int) $item->qty,
                     'name' => "($brandName) $productName $gender $age ($size) $model"
-                );
+                ];
             })->toArray();
-            array_push($itemDetails, array(
+            $itemDetails[] = [
                 'id' => 'shipping-cost',
                 'price' => $checkout->first()->shipping()->first()->shippingcost,
                 'quantity' => 1,
                 'name' => 'biaya ongkir'
-            ));
-            array_push($itemDetails, [
+            ];
+            $itemDetails[] = [
                 'id' => 'D01',
                 'price' => -$this->calcDiscount(),
                 'quantity' => 1,
                 'name' => 'Discount'
-            ]);
-            $transactionDetails = array(
+            ];
+            $transactionDetails = [
                 'order_id' => $checkout->first()->code,
                 'gross_amount' => (int) $checkout->first()->grandtotal
-            );
+            ]; */
+
+            $itemDetails = [
+                [
+                    'id' => 'test',
+                    'price' => 1000,
+                    'quantity' => 1,
+                    'name' => 'product 1'
+                ]
+            ];
+
+            $transactionDetails = [
+                'order_id' => \Str::uuid()->toString(),
+                'gross_amount' => 1000
+            ];
 
             $transaction = $this->paymentService->sendTransaction($transactionDetails, $itemDetails, $bank);
             if ($transaction['status_code'] != 201) {
