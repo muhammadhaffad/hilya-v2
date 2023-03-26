@@ -296,8 +296,11 @@ class CheckoutServiceImplement implements CheckoutService
                 ]);
                 DB::commit();
                 return [
-                    'code' => 204,
-                    'message' => 'Pesanan sukses dibuat, silahkan melakukan pembayaran'
+                    'code' => 201,
+                    'message' => 'Pesanan sukses dibuat, silahkan melakukan pembayaran',
+                    'data' => [
+                        'code' => $codeOrder
+                    ]
                 ];
             } else {
                 DB::rollBack();
