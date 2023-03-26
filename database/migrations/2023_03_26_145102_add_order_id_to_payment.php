@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('payment', function (Blueprint $table) {
+        Schema::table('payments', function (Blueprint $table) {
             $table->after('id', function (Blueprint $table) {
                 $table->uuid('order_id')->unique();
             });
@@ -27,7 +27,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('payment', function (Blueprint $table) {
+        Schema::table('payments', function (Blueprint $table) {
             $table->dropColumn('order_id');
         });
     }
