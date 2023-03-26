@@ -226,23 +226,6 @@ class CheckoutServiceImplement implements CheckoutService
             $address = $address->clone()->find($checkout->first()->shipping()->first()->shipping_address_id);
             $totalWeight = $checkout->first()->totalweight;
             $cost = $this->shippingCostService->getCosts(222, $address->city_id, $totalWeight, $courier);
-            $orderItems = $checkout->first()->load('orderItems.productItem.productOrigins')->orderItems;
-            foreach ($orderItems as $orderItem ) {
-                if ($orderItem->productItem->is_bundle) {
-                    $productOriginIds = $orderItem->productItem->productOrigins->pluck('id');
-                    ProductOrigin::whereIn('id', $productOriginIds)->decrement('stock', $orderItem->qty);
-                } 
-            }
-            $orderItems = $checkout->first()->load('orderItems.productItem.productOrigins')->orderItems;
-            foreach ($orderItems as $orderItem ) {
-                if ($orderItem->productItem->is_bundle) {
-                    $orderItem->productItem->update([
-                        'stock' => $orderItem->productItem->productOrigins->min('stock')
-                    ]);
-                } else {
-                    $orderItem->productItem->decrement('stock', $orderItem->qty);
-                }
-            }
             if (@$cost['services'][$service]) {
                 $checkout->first()->shipping()->update([
                     'courier' => $cost['courier'],
@@ -263,58 +246,7 @@ class CheckoutServiceImplement implements CheckoutService
             $checkout->clone()->update([
                 'grandtotal' => $checkout->first()->subtotal + $cost['services'][$service] - $this->calcDiscount()
             ]);
-            // DB::commit();
-            $itemDetails = $checkout->first()->orderItems()->with([
-                'productItem',
-                'productItem.product',
-                'productItem.product.productBrand'
-            ])->get(['qty', 'product_item_id'])->map(function ($item, $key) {
-                $brandName = $item->productItem->product->productBrand->name;
-                $productName = $item->productItem->product->name;
-                $gender = $item->productItem->gender;
-                $age = $item->productItem->age;
-                $size = $item->productItem->size;
-                $model = $item->productItem->model;
-                return [
-                    'id' => 'product-detail.' . $item->productItem->id,
-                    'price' => (int) $item->productItem->price,
-                    'stock' => (int) $item->productItem->stock,
-                    'quantity' => (int) $item->qty,
-                    'name' => "($brandName) $productName $gender $age ($size) $model"
-                ];
-            })->toArray();
-            $itemDetails[] = [
-                'id' => 'shipping-cost',
-                'price' => $checkout->first()->shipping()->first()->shippingcost,
-                'quantity' => 1,
-                'name' => 'biaya ongkir'
-            ];
-            $itemDetails[] = [
-                'id' => 'D01',
-                'price' => -$this->calcDiscount(),
-                'quantity' => 1,
-                'name' => 'Discount'
-            ];
-            $transactionDetails = [
-                'order_id' => $checkout->first()->code,
-                'gross_amount' => (int) $checkout->first()->grandtotal
-            ];
-            // dd($itemDetails);
-            /* $itemDetails = [
-                [
-                    'id' => 'test',
-                    'price' => 1000,
-                    'quantity' => 1,
-                    'name' => 'product 1'
-                ]
-            ];
-
-            $transactionDetails = [
-                'order_id' => \Str::uuid()->toString(),
-                'gross_amount' => 1000
-            ]; */
-
-            $transaction = $this->paymentService->sendTransaction($transactionDetails, $itemDetails, $bank);
+            $transaction = $this->paymentService->sendTransaction($bank);
             if ($transaction['status_code'] != 201) {
                 DB::rollBack();
                 return [
@@ -334,7 +266,7 @@ class CheckoutServiceImplement implements CheckoutService
                     'status' => $transaction['transaction_status'],
                     'transactiontime' => $transaction['transaction_time']
                 ]);
-                $codeOrder = $checkout->first()->code;
+                $GLOBALS['codeOrder'] = $checkout->first()->code;
                 $productsPromo = $checkout->first()->productItems()->whereHas('product', fn($q) => $q->where('ispromo',1))->get(['product_items.id','price', 'discount'])->toJson();
                 /* tidak membuat kondisi where status = checkout berubah menjadi status = pending*/
                 $checkout->clone()->update([
@@ -342,13 +274,6 @@ class CheckoutServiceImplement implements CheckoutService
                     'custom_properties' => $productsPromo
                 ]);
                 DB::commit();
-                return [
-                    'code' => 201,
-                    'message' => 'Pesanan sukses dibuat, silahkan melakukan pembayaran',
-                    'data' => [
-                        'code' => $codeOrder
-                    ]
-                ];
             } else {
                 DB::rollBack();
                 return array(
@@ -359,6 +284,35 @@ class CheckoutServiceImplement implements CheckoutService
         } catch (Exception $e) {
             DB::rollBack();
             throw $e;
+        }
+        DB::beginTransaction();
+        try {
+            $orderItems = $checkout->first()->load('orderItems.productItem.productOrigins')->orderItems;
+            foreach ($orderItems as $orderItem ) {
+                if ($orderItem->productItem->is_bundle) {
+                    $productOriginIds = $orderItem->productItem->productOrigins->pluck('id');
+                    ProductOrigin::whereIn('id', $productOriginIds)->decrement('stock', $orderItem->qty);
+                } 
+            }
+            $orderItems = $checkout->first()->load('orderItems.productItem.productOrigins')->orderItems;
+            foreach ($orderItems as $orderItem ) {
+                if ($orderItem->productItem->is_bundle) {
+                    $orderItem->productItem->update([
+                        'stock' => $orderItem->productItem->productOrigins->min('stock')
+                    ]);
+                } else {
+                    $orderItem->productItem->decrement('stock', $orderItem->qty);
+                }
+            }
+            return [
+                'code' => '201',
+                'message' => 'Berhasil membuat pesanan, silahkan melakukan pembayaran',
+                'data' => [
+                    'code' => $codeOrder
+                ]
+            ];
+        } catch (\Exception $th) {
+            throw $th;
         }
     }
     /**
