@@ -281,8 +281,6 @@ class CheckoutServiceImplement implements CheckoutService
                     'status' => $transaction['transaction_status'],
                     'transactiontime' => $transaction['transaction_time']
                 ]);
-                // ProductOrigin::whereIn('id', [1,2])->update(['stock' => 3]);
-                // ProductItem::where('id', 1)->update(['stock'=> 3]);
                 foreach ($checkoutInformation->orderItems as $orderItem ) {
                     if ($orderItem->productItem->is_bundle) {
                         $productOriginIds = $orderItem->productItem->productOrigins->pluck('id');
@@ -321,93 +319,6 @@ class CheckoutServiceImplement implements CheckoutService
                     'message' => 'Pembayaran fraud, silahkan coba dengan bank lain'
                 );
             }
-
-
-            /* $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']]);
-            $address = ShippingAddress::where('user_id', auth()->user()->id);
-            $address = $address->clone()->find($checkout->first()->shipping()->first()->shipping_address_id);
-            $totalWeight = $checkout->first()->totalweight;
-            $cost = $this->shippingCostService->getCosts(222, $address->city_id, $totalWeight, $courier);
-            if (@$cost['services'][$service]) {
-                $checkout->first()->shipping()->update([
-                    'courier' => $cost['courier'],
-                    'service' => $service,
-                    'shippingcost' => $cost['services'][$service]
-                ]);
-            } else {
-                return [
-                    'code' => 422,
-                    'message' => 'Data yang diberikan tidak valid',
-                    'bag' => 'shippingErrors',
-                    'errors' => [
-                        'courier' => ['Kurir atau layanan tidak didukung']
-                    ]
-                ];
-            }
-            $checkout->clone()->update([
-                'grandtotal' => $checkout->first()->subtotal + $cost['services'][$service] - $this->calcDiscount()
-            ]);
-            $transaction = $this->paymentService->sendTransaction($bank);
-            if ($transaction['status_code'] != 201) {
-                DB::rollBack();
-                return [
-                    'code' => 422,
-                    'message' => 'Data yang diberikan tidak valid',
-                    'bag' => 'transactionErrors',
-                    'errors' => [
-                        'bank' => ['Terjadi kesalahan transaksi']
-                    ]
-                ];
-            }
-            if ($transaction['fraud_status'] === 'accept') {
-                $checkout->first()->payment()->create([
-                    'bank' => $bank,
-                    'vanumber' => $transaction['va_numbers'][0]['va_number'],
-                    'amount' => $transaction['gross_amount'],
-                    'status' => $transaction['transaction_status'],
-                    'transactiontime' => $transaction['transaction_time']
-                ]);
-                $codeOrder = $checkout->first()->code;
-                // ProductOrigin::whereIn('id', [1,2])->update(['stock' => 3]);
-                // ProductItem::where('id', 1)->update(['stock'=> 3]);
-                $checkout = Order::where('code', $codeOrder);
-                $orderItems = $checkout->first()->load('orderItems.productItem.productOrigins')->orderItems;
-                foreach ($orderItems as $orderItem ) {
-                    if ($orderItem->productItem->is_bundle) {
-                        $productOriginIds = $orderItem->productItem->productOrigins->pluck('id');
-                        ProductOrigin::whereIn('id', $productOriginIds)->decrement('stock', $orderItem->qty);
-                    } 
-                }
-                $orderItems = $checkout->first()->load('orderItems.productItem.productOrigins')->orderItems;
-                foreach ($orderItems as $orderItem ) {
-                    if ($orderItem->productItem->is_bundle) {
-                        $orderItem->productItem->update([
-                            'stock' => $orderItem->productItem->productOrigins->min('stock')
-                        ]);
-                    } else {
-                        $orderItem->productItem->decrement('stock', $orderItem->qty);
-                    }
-                }
-                $productsPromo = $checkout->first()->productItems()->whereHas('product', fn($q) => $q->where('ispromo',1))->get(['product_items.id','price', 'discount'])->toJson();
-                $checkout->clone()->update([
-                    'status' => $transaction['transaction_status'],
-                    'custom_properties' => $productsPromo
-                ]);
-                DB::commit();
-                return [
-                    'code' => '201',
-                    'message' => 'Berhasil membuat pesanan, silahkan melakukan pembayaran',
-                    'data' => [
-                        'code' => $codeOrder
-                    ]
-                ];
-            } else {
-                DB::rollBack();
-                return array(
-                    'code' => 500,
-                    'message' => 'Pembayaran fraud, silahkan coba dengan bank lain'
-                );
-            } */
         } catch (Exception $e) {
             DB::rollBack();
             throw $e;

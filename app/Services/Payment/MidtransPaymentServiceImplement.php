@@ -46,31 +46,6 @@ class MidtransPaymentServiceImplement implements PaymentService
             'quantity' => 1,
             'name' => 'biaya ongkir'
         ];
-        // $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']]);
-        // $itemDetails = $checkout->first()->orderItems()->with([
-        //     'productItem:id,product_id,gender,age,size,price,note_bene,is_bundle',
-        //     'productItem.product:id,product_brand_id,name',
-        //     'productItem.product.productBrand:id,name'
-        // ])->get(['qty', 'product_item_id'])->map(function ($item, $key) {
-        //     $brandName = $item->productItem->product->productBrand->name;
-        //     $productName = $item->productItem->product->name;
-        //     $gender = $item->productItem->gender;
-        //     $age = $item->productItem->age;
-        //     $size = $item->productItem->size;
-        //     $model = $item->productItem->model;
-        //     return [
-        //         'id' => 'product-detail.' . $item->productItem->id,
-        //         'price' => (int) $item->productItem->price,
-        //         'quantity' => (int) $item->qty,
-        //         'name' => "($brandName) $productName $gender $age ($size) $model"
-        //     ];
-        // })->toArray();
-        // $itemDetails[] = [
-        //     'id' => 'shipping-cost',
-        //     'price' => $checkout->first()->shipping()->first()->shippingcost,
-        //     'quantity' => 1,
-        //     'name' => 'biaya ongkir'
-        // ];
         $itemDetails[] = [
             'id' => 'D01',
             'price' => $this->calcDiscount(),
@@ -81,18 +56,6 @@ class MidtransPaymentServiceImplement implements PaymentService
             'order_id' => $chekcoutInformation->code,
             'gross_amount' => (int) $chekcoutInformation->grandtotal
         ];
-
-        // $itemDetails[] = [
-        //     'id' => 'D01',
-        //     'price' => 1000,
-        //     'quantity' => 1,
-        //     'name' => 'kontolll'
-        // ];
-        // $transactionDetails = [
-        //     'order_id' => \Str::uuid()->toString(),
-        //     'gross_amount' => 1000
-        // ];
-
         $client = new Client([
             'base_uri' => env('MIDTRANS_URL'),
             'headers' => [
