@@ -219,25 +219,6 @@ class CheckoutServiceImplement implements CheckoutService
         $courier = $attr['courier'];
         $service = $attr['service'];
         $bank = $attr['bank'];
-        $codeOrder = '';
-        $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']]);
-        $orderItems = $checkout->first()->load('orderItems.productItem.productOrigins')->orderItems;
-        foreach ($orderItems as $orderItem ) {
-            if ($orderItem->productItem->is_bundle) {
-                $productOriginIds = $orderItem->productItem->productOrigins->pluck('id');
-                ProductOrigin::whereIn('id', $productOriginIds)->decrement('stock', $orderItem->qty);
-            } 
-        }
-        $orderItems = $checkout->first()->load('orderItems.productItem.productOrigins')->orderItems;
-        foreach ($orderItems as $orderItem ) {
-            if ($orderItem->productItem->is_bundle) {
-                $orderItem->productItem->update([
-                    'stock' => $orderItem->productItem->productOrigins->min('stock')
-                ]);
-            } else {
-                $orderItem->productItem->decrement('stock', $orderItem->qty);
-            }
-        }
         DB::beginTransaction();
         try {
             $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']]);
@@ -286,6 +267,24 @@ class CheckoutServiceImplement implements CheckoutService
                     'transactiontime' => $transaction['transaction_time']
                 ]);
                 $codeOrder = $checkout->first()->code;
+                $checkout = Order::where('code', $codeOrder);
+                $orderItems = $checkout->first()->load('orderItems.productItem.productOrigins')->orderItems;
+                foreach ($orderItems as $orderItem ) {
+                    if ($orderItem->productItem->is_bundle) {
+                        $productOriginIds = $orderItem->productItem->productOrigins->pluck('id');
+                        ProductOrigin::whereIn('id', $productOriginIds)->decrement('stock', $orderItem->qty);
+                    } 
+                }
+                $orderItems = $checkout->first()->load('orderItems.productItem.productOrigins')->orderItems;
+                foreach ($orderItems as $orderItem ) {
+                    if ($orderItem->productItem->is_bundle) {
+                        $orderItem->productItem->update([
+                            'stock' => $orderItem->productItem->productOrigins->min('stock')
+                        ]);
+                    } else {
+                        $orderItem->productItem->decrement('stock', $orderItem->qty);
+                    }
+                }
                 $productsPromo = $checkout->first()->productItems()->whereHas('product', fn($q) => $q->where('ispromo',1))->get(['product_items.id','price', 'discount'])->toJson();
                 /* tidak membuat kondisi where status = checkout berubah menjadi status = pending*/
                 $checkout->clone()->update([
