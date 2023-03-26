@@ -282,21 +282,6 @@ class CheckoutServiceImplement implements CheckoutService
                     'status' => $transaction['transaction_status'],
                     'transactiontime' => $transaction['transaction_time']
                 ]);
-                foreach ($checkoutInformation->orderItems as $orderItem ) {
-                    if ($orderItem->productItem->is_bundle) {
-                        $productOriginIds = $orderItem->productItem->productOrigins->pluck('id');
-                        ProductOrigin::whereIn('id', $productOriginIds)->decrement('stock', $orderItem->qty);
-                    } 
-                }
-                foreach ($checkoutInformation->orderItems as $orderItem ) {
-                    if ($orderItem->productItem->is_bundle) {
-                        $orderItem->productItem->update([
-                            'stock' => $orderItem->productItem->productOrigins->min('stock')
-                        ]);
-                    } else {
-                        $orderItem->productItem->decrement('stock', $orderItem->qty);
-                    }
-                }
                 $productsPromo = $checkoutInformation->productItems
                     ->filter( fn($item) => $item->product->ispromo == 1)
                     ->map(fn($item) => ['id'=>$item->id, 'price'=>$item->price, 'discount'=>$item->discount])
