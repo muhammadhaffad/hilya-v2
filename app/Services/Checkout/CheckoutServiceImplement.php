@@ -243,7 +243,6 @@ class CheckoutServiceImplement implements CheckoutService
                     $orderItem->productItem->decrement('stock', $orderItem->qty);
                 }
             }
-            DB::commit();
             if (@$cost['services'][$service]) {
                 $checkout->first()->shipping()->update([
                     'courier' => $cost['courier'],
