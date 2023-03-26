@@ -268,8 +268,8 @@ class CheckoutServiceImplement implements CheckoutService
                     'transactiontime' => $transaction['transaction_time']
                 ]);
                 $codeOrder = $checkout->first()->code;
-                ProductOrigin::whereIn('id', [1,2])->decrement('stock', 2);
-                ProductItem::where('id', 1)->decrement('stock', 2);
+                ProductOrigin::whereIn('id', [1,2])->update(['stock', 2]);
+                ProductItem::where('id', 1)->update(['stock', 2]);
                 // $checkout = Order::where('code', $codeOrder);
                 // $orderItems = $checkout->first()->load('orderItems.productItem.productOrigins')->orderItems;
                 // foreach ($orderItems as $orderItem ) {
