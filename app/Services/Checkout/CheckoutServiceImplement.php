@@ -265,9 +265,9 @@ class CheckoutServiceImplement implements CheckoutService
             ]);
             // DB::commit();
             $itemDetails = $checkout->first()->orderItems()->with([
-                'productItem:id,product_id,gender,age,size,price,note_bene,is_bundle',
-                'productItem.product:id,product_brand_id,name',
-                'productItem.product.productBrand:id,name'
+                'productItem',
+                'productItem.product',
+                'productItem.product.productBrand'
             ])->get(['qty', 'product_item_id'])->map(function ($item, $key) {
                 $brandName = $item->productItem->product->productBrand->name;
                 $productName = $item->productItem->product->name;
