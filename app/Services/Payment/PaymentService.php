@@ -4,5 +4,5 @@ namespace App\Services\Payment;
 
 interface PaymentService
 {
-    public function sendTransaction(string $bank): array;
+    public function sendTransaction($checkoutInformation, string $bank): array;
 }
