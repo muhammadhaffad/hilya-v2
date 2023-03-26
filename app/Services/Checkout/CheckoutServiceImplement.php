@@ -268,6 +268,7 @@ class CheckoutServiceImplement implements CheckoutService
                     'shippingcost' => $cost['services'][$service]
                 ]);
             } else {
+                DB::rollBack();
                 return [
                     'code' => 422,
                     'message' => 'Data yang diberikan tidak valid',

@@ -26,7 +26,6 @@ class MidtransPaymentServiceImplement implements PaymentService
     {
         if (!in_array($bank, ['bni', 'bri']))
             return [];
-        \DB::commit();
         $itemDetails = $chekcoutInformation->orderItems->map( function ($item, $key) {
             $brandName = $item->productItem->product->productBrand->name;
             $productName = $item->productItem->product->name;
@@ -41,9 +40,10 @@ class MidtransPaymentServiceImplement implements PaymentService
                 'name' => "($brandName) $productName $gender $age ($size) $model"
             ];            
         })->toArray();
+        $x = $chekcoutInformation->toArray();
         $itemDetails[] = [
             'id' => 'shipping-cost',
-            'price' => $chekcoutInformation->shipping->shippingcost,
+            'price' => $x['shipping']['shippingcost'],//$chekcoutInformation->shipping->shippingcost,
             'quantity' => 1,
             'name' => 'biaya ongkir'
         ];
@@ -54,8 +54,8 @@ class MidtransPaymentServiceImplement implements PaymentService
             'name' => 'Discount'
         ];
         $transactionDetails = [
-            'order_id' => $chekcoutInformation->code,
-            'gross_amount' => (int) $chekcoutInformation->grandtotal
+            'order_id' => $x['code'], //$chekcoutInformation->code,
+            'gross_amount' => $x['grandtotal'] //(int) $chekcoutInformation->grandtotal
         ];
         $client = new Client([
             'base_uri' => env('MIDTRANS_URL'),
