@@ -230,9 +230,7 @@ class CheckoutServiceImplement implements CheckoutService
             foreach ($orderItems as $orderItem ) {
                 if ($orderItem->productItem->is_bundle) {
                     $productOriginIds = $orderItem->productItem->productOrigins->pluck('id');
-                    ProductOrigin::whereIn('id', $productOriginIds)->update([
-                        'stock' => \DB::raw('stock - ' . $orderItem->qty)
-                    ]);
+                    ProductOrigin::whereIn('id', $productOriginIds)->decrement('stock', $orderItem->qty);
                 } 
             }
             $orderItems = $checkout->first()->load('orderItems.productItem.productOrigins')->orderItems;
@@ -242,9 +240,7 @@ class CheckoutServiceImplement implements CheckoutService
                         'stock' => $orderItem->productItem->productOrigins->min('stock')
                     ]);
                 } else {
-                    $orderItem->productItem->update([
-                        'stock' => \DB::raw('stock - ' . $orderItem->qty) 
-                    ]);
+                    $orderItem->productItem->decrement('stock', $orderItem->qty);
                 }
             }
             DB::commit();
