@@ -45,12 +45,12 @@ class MidtransPaymentServiceImplement implements PaymentService
                 'name' => "($brandName) $productName $gender $age ($size) $model"
             ];
         })->toArray();
-        $itemDetails[] = [
-            'id' => 'shipping-cost',
-            'price' => $checkout->first()->shipping()->first()->shippingcost,
-            'quantity' => 1,
-            'name' => 'biaya ongkir'
-        ];
+        // $itemDetails[] = [
+        //     'id' => 'shipping-cost',
+        //     'price' => $checkout->first()->shipping()->first()->shippingcost,
+        //     'quantity' => 1,
+        //     'name' => 'biaya ongkir'
+        // ];
         $itemDetails[] = [
             'id' => 'D01',
             'price' => 0,
@@ -70,7 +70,7 @@ class MidtransPaymentServiceImplement implements PaymentService
         ];
         $transactionDetails = [
             'order_id' => \Str::uuid()->toString(),
-            'gross_amount' => 1000
+            'gross_amount' => 1000+157211
         ];
 
         $client = new Client([
