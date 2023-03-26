@@ -263,8 +263,8 @@ class CheckoutServiceImplement implements CheckoutService
             $checkout->clone()->update([
                 'grandtotal' => $checkout->first()->subtotal + $cost['services'][$service] - $this->calcDiscount()
             ]);
-
-            /* $itemDetails = $checkout->first()->orderItems()->with([
+            DB::commit();
+            $itemDetails = $checkout->first()->orderItems()->with([
                 'productItem:id,product_id,gender,age,size,price,note_bene,is_bundle',
                 'productItem.product:id,product_brand_id,name',
                 'productItem.product.productBrand:id,name'
@@ -297,9 +297,9 @@ class CheckoutServiceImplement implements CheckoutService
             $transactionDetails = [
                 'order_id' => $checkout->first()->code,
                 'gross_amount' => (int) $checkout->first()->grandtotal
-            ]; */
+            ];
 
-            $itemDetails = [
+            /* $itemDetails = [
                 [
                     'id' => 'test',
                     'price' => 1000,
@@ -311,7 +311,7 @@ class CheckoutServiceImplement implements CheckoutService
             $transactionDetails = [
                 'order_id' => \Str::uuid()->toString(),
                 'gross_amount' => 1000
-            ];
+            ]; */
 
             $transaction = $this->paymentService->sendTransaction($transactionDetails, $itemDetails, $bank);
             if ($transaction['status_code'] != 201) {
