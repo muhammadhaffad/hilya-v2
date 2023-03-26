@@ -305,6 +305,7 @@ class CheckoutServiceImplement implements CheckoutService
                     $orderItem->productItem->decrement('stock', $orderItem->qty);
                 }
             }
+            DB::commit();
             return [
                 'code' => '201',
                 'message' => 'Berhasil membuat pesanan, silahkan melakukan pembayaran',
