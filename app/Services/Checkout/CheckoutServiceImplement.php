@@ -287,6 +287,7 @@ class CheckoutServiceImplement implements CheckoutService
         }
         DB::beginTransaction();
         try {
+            $checkout = Order::where('code', $codeOrder);
             $orderItems = $checkout->first()->load('orderItems.productItem.productOrigins')->orderItems;
             foreach ($orderItems as $orderItem ) {
                 if ($orderItem->productItem->is_bundle) {
