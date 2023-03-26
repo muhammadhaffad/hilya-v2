@@ -57,21 +57,21 @@ class MidtransPaymentServiceImplement implements PaymentService
             'quantity' => 1,
             'name' => 'Discount'
         ];
-        $transactionDetails = [
-            'order_id' => $checkout->first()->code,
-            'gross_amount' => (int) $checkout->first()->grandtotal
-        ];
-
-        // $itemDetails[] = [
-        //     'id' => 'D01',
-        //     'price' => 1000,
-        //     'quantity' => 1,
-        //     'name' => 'kontolll'
-        // ];
         // $transactionDetails = [
-        //     'order_id' => \Str::uuid()->toString(),
-        //     'gross_amount' => 1000
+        //     'order_id' => $checkout->first()->code,
+        //     'gross_amount' => (int) $checkout->first()->grandtotal
         // ];
+
+        $itemDetails[] = [
+            'id' => 'D01',
+            'price' => 1000,
+            'quantity' => 1,
+            'name' => 'kontolll'
+        ];
+        $transactionDetails = [
+            'order_id' => \Str::uuid()->toString(),
+            'gross_amount' => 1000
+        ];
 
         $client = new Client([
             'base_uri' => env('MIDTRANS_URL'),
