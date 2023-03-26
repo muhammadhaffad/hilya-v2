@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::table('payments', function (Blueprint $table) {
             $table->after('id', function (Blueprint $table) {
-                $table->uuid('order_id')->unique();
+                $table->uuid('code')->unique();
             });
         });
     }
