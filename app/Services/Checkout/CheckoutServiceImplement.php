@@ -219,6 +219,7 @@ class CheckoutServiceImplement implements CheckoutService
         $courier = $attr['courier'];
         $service = $attr['service'];
         $bank = $attr['bank'];
+        $codeOrder = '';
         DB::beginTransaction();
         try {
             $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']]);
@@ -266,7 +267,7 @@ class CheckoutServiceImplement implements CheckoutService
                     'status' => $transaction['transaction_status'],
                     'transactiontime' => $transaction['transaction_time']
                 ]);
-                $GLOBALS['codeOrder'] = $checkout->first()->code;
+                $codeOrder = $checkout->first()->code;
                 $productsPromo = $checkout->first()->productItems()->whereHas('product', fn($q) => $q->where('ispromo',1))->get(['product_items.id','price', 'discount'])->toJson();
                 /* tidak membuat kondisi where status = checkout berubah menjadi status = pending*/
                 $checkout->clone()->update([
