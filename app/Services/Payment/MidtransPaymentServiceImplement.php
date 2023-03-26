@@ -26,6 +26,7 @@ class MidtransPaymentServiceImplement implements PaymentService
     {
         if (!in_array($bank, ['bni', 'bri']))
             return [];
+        \DB::commit();
         $itemDetails = $chekcoutInformation->orderItems->map( function ($item, $key) {
             $brandName = $item->productItem->product->productBrand->name;
             $productName = $item->productItem->product->name;
