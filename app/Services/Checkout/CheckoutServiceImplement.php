@@ -274,7 +274,7 @@ class CheckoutServiceImplement implements CheckoutService
                 ];
             }
             if ($transaction['fraud_status'] === 'accept') {
-                $checkoutInformation->payment->create([
+                $checkoutInformation->payment()->create([
                     'bank' => $bank,
                     'vanumber' => $transaction['va_numbers'][0]['va_number'],
                     'amount' => $transaction['gross_amount'],
