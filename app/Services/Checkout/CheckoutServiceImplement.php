@@ -299,7 +299,7 @@ class CheckoutServiceImplement implements CheckoutService
                 'order_id' => $checkout->first()->code,
                 'gross_amount' => (int) $checkout->first()->grandtotal
             ];
-            dd($itemDetails);
+            // dd($itemDetails);
             /* $itemDetails = [
                 [
                     'id' => 'test',
