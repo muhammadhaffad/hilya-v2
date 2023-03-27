@@ -48,7 +48,7 @@
                 <tr>
                     <td colspan="2">{{ $order->status }}</td>
                     <td colspan="2">{{ $order->payment->transactiontime }}</td>
-                    <td colspan="2">{{ $order->payment->setlementtime ?? '-' }}</td>
+                    <td colspan="2">{{ $order->payment->settlementtime ?? '-' }}</td>
                     <td colspan="3">{{ $order->payment->amount }}</td>
                 </tr>
                 <tr>
