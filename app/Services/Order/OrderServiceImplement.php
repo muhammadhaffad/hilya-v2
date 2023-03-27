@@ -9,7 +9,7 @@ class OrderServiceImplement implements OrderService
 {
     private function calcDiscount($code): int
     {
-        $order = Payment::where('code_order', $code)->first()->order()->first()->load('orderItems.productItem');
+        $order = Payment::where('order_code', $code)->first()->order()->first()->load('orderItems.productItem');
         $total = 0;
         $customProps = collect($order->custom_properties);
         foreach ($order->orderItems as $orderItem) {
@@ -60,7 +60,7 @@ class OrderServiceImplement implements OrderService
      */
     public function getDetailOrder(int $userId, string $code): array
     {
-        $order = Payment::where('code_order', $code)->first()->order()->where('user_id', $userId)->with([
+        $order = Payment::where('order_code', $code)->first()->order()->where('user_id', $userId)->with([
             'user:id,fullname',
             'orderItems.productItem.product.productImage',
             'orderItems.productItem.product.productBrand',

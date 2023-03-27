@@ -276,6 +276,7 @@ class CheckoutServiceImplement implements CheckoutService
                         if ($orderItem->productItem->is_bundle) {
                             $productOriginIds = $orderItem->productItem->productOrigins->pluck('id');
                             ProductOrigin::whereIn('id', $productOriginIds)->decrement('stock', $orderItem->qty);
+                            DB::commit();
                         } 
                     }
                     foreach ($checkoutInformation->orderItems as $orderItem ) {
