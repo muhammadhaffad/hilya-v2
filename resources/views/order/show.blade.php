@@ -35,7 +35,7 @@
             </tr>
             <tr>
                 <th>Waktu bayar:</th>
-                <td>{{ $order->payment->setlementtime ?? '-' }}</td>
+                <td>{{ $order->payment->settlementtime ?? '-' }}</td>
             </tr>
         </table>
         @php $custom_properties = collect($order->custom_properties); @endphp
