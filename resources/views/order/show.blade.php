@@ -11,7 +11,7 @@
         <table>
             <tr>
                 <th>Kode:</th>
-                <td>{{ $order->code }}</td>
+                <td>{{ $order->payment->order_code }}</td>
             </tr>
             <tr>
                 <th>Status:</th>

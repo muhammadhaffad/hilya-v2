@@ -88,7 +88,7 @@
                 </tr>
                 @endforeach
             </table>
-            <button style="margin-bottom: 32px" onclick="window.location='{{ route('customer.orders.show', ['code' => $order->payment->order_code]) }}'">Lihat Detail</button>
+            <button style="margin-bottom: 32px" onclick="window.location='{{ route('customer.orders.show', ['code' => ($order->payment?->order_code ?: '-')]) }}'">Lihat Detail</button>
         @endforeach
     </section>
 @endsection
