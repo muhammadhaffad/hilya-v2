@@ -22,11 +22,11 @@ class MidtransPaymentServiceImplement implements PaymentService
         })();
     }
 
-    public function sendTransaction($chekcoutInformation, string $bank): array
+    public function sendTransaction($chekcoutInformation, int $shippingCost, int $grossAmount, string $bank): array
     {
         if (!in_array($bank, ['bni', 'bri']))
             return [];
-        $itemDetails = $chekcoutInformation->orderItems->map( function ($item, $key) {
+        $itemDetails = $chekcoutInformation->orderItems->map( function ($item) {
             $brandName = $item->productItem->product->productBrand->name;
             $productName = $item->productItem->product->name;
             $gender = $item->productItem->gender;
@@ -42,7 +42,7 @@ class MidtransPaymentServiceImplement implements PaymentService
         })->toArray();
         $itemDetails[] = [
             'id' => 'shipping-cost',
-            'price' => 68000, //$chekcoutInformation->shipping->shippingcost,
+            'price' => $shippingCost,
             'quantity' => 1,
             'name' => 'biaya ongkir'
         ];
@@ -54,7 +54,7 @@ class MidtransPaymentServiceImplement implements PaymentService
         ];
         $transactionDetails = [
             'order_id' => \Str::uuid()->toString(),//$chekcoutInformation->code,
-            'gross_amount' => $chekcoutInformation->subtotal + 68000
+            'gross_amount' => $grossAmount
         ];
         $client = new Client([
             'base_uri' => env('MIDTRANS_URL'),

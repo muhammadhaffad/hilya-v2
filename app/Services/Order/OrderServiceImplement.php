@@ -3,12 +3,13 @@
 namespace App\Services\Order;
 
 use App\Models\Order;
+use App\Models\Payment;
 
 class OrderServiceImplement implements OrderService
 {
     private function calcDiscount($code): int
     {
-        $order = Order::where('code', $code)->first()->load('orderItems.productItem');
+        $order = Payment::where('code_order', $code)->first()->order()->first()->load('orderItems.productItem');
         $total = 0;
         $customProps = collect($order->custom_properties);
         foreach ($order->orderItems as $orderItem) {
@@ -59,7 +60,7 @@ class OrderServiceImplement implements OrderService
      */
     public function getDetailOrder(int $userId, string $code): array
     {
-        $order = Order::where('user_id', $userId)->code($code)->with([
+        $order = Payment::where('code_order', $code)->first()->order()->where('user_id', $userId)->with([
             'user:id,fullname',
             'orderItems.productItem.product.productImage',
             'orderItems.productItem.product.productBrand',
@@ -99,23 +100,20 @@ class OrderServiceImplement implements OrderService
             ->select('orders.*')
             ->distinct();
         if (@$criteria['search']) {
-            
             $orders->where(function ($query) use ($criteria) {
-                $query->where('orders.code', 'LIKE', '%' . $criteria['search'] . '%')
+                $query->where('payment.order_code', 'LIKE', '%' . $criteria['search'] . '%')
                     ->orWhere('product_items.gender', 'LIKE', '%' . $criteria['search'] . '%')
                     ->orWhere('product_items.age', 'LIKE', '%' . $criteria['search'] . '%')
                     ->orWhere('product_brands.name', 'LIKE', '%' . $criteria['search'] . '%')
                     ->orWhere('products.name', 'LIKE', '%' . $criteria['search'] . '%');
             });
         }
-        if (@$criteria['status']) {
-            
+        if (@$criteria['status']) {            
             $orders->where(function ($query) use ($criteria) {
                 $query->withStatus([$criteria['status']]);
             });
         }
         if (@$criteria['start_date'] !== null && @$criteria['end_date'] !== null) {
-            
             $orders->where(function ($query) use ($criteria) {
                 $query->whereBetween('orders.created_at', [$criteria['start_date'], $criteria['end_date']]);
             });
@@ -126,7 +124,7 @@ class OrderServiceImplement implements OrderService
             'productItems.product:id,product_brand_id,name',
             'productItems.product.productImage',
             'productItems.product.productBrand',
-            'payment:id,order_id,transactiontime,settlementtime,amount'
+            'payment'
         ])->orderBy('created_at', 'desc')->get();
         if ($orders) {
             return [

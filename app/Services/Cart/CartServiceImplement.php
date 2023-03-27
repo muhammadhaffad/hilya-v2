@@ -268,7 +268,6 @@ class CartServiceImplement implements CartService
             if (!$cart)
                 $cart = Order::create([
                     'user_id' => auth()->user()->id,
-                    'code' => str()->orderedUUid(),
                     'subtotal' => 0,
                     'totalweight' => 0,
                     'status' => 'cart'
