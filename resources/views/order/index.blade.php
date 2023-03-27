@@ -35,7 +35,7 @@
             <table>
                 <tr>
                     <th colspan="9">
-                        Kode : {{ $order->code }}
+                        Kode : {{ $order->payment->order_code }}
                     </th>
                 </tr>
                 @php $custom_properties = collect($order->custom_properties); @endphp
@@ -88,7 +88,7 @@
                 </tr>
                 @endforeach
             </table>
-            <button style="margin-bottom: 32px" onclick="window.location='{{ route('customer.orders.show', ['code' => $order->code]) }}'">Lihat Detail</button>
+            <button style="margin-bottom: 32px" onclick="window.location='{{ route('customer.orders.show', ['code' => $order->payment->order_code]) }}'">Lihat Detail</button>
         @endforeach
     </section>
 @endsection
