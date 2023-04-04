@@ -13,9 +13,17 @@ class ProductBrandImplement implements ProductBrandService
     public function getAllBrand() : array
     {
         $productBrand = ProductBrand::get();
-        return array(
-            'code' => $productBrand->all() ? 200 : 404,
-            'data' => $productBrand->all()
-        );
+        if (!$productBrand->isEmpty()) {
+            return [
+                'code' => 200,
+                'message' => 'Sukses mendapatkan product brands',
+                'data' => $productBrand
+            ];
+        } else {
+            return [
+                'code' => 404,
+                'message' => 'Tidak ada data',
+            ];
+        }
     }
 }

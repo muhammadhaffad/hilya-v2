@@ -20,7 +20,7 @@ class OrderController extends Controller
         $result = $this->orderService->searchOrders(auth()->user()->id, $request->all());
         if ($result['code'] == 200) {
             // return $result;
-            return view('order.index', ['orders' => $result['data']]);
+            return view('v2.order.index', ['orders' => $result['data']]);
         } else {
             return abort(404);
         }
@@ -30,7 +30,7 @@ class OrderController extends Controller
         $result = $this->orderService->getDetailOrder(auth()->user()->id, $code);
         if ($result['code'] == 200) {
             // return $result['data'];
-            return view('order.show', ['order' => $result['data']]);
+            return view('v2.order.show', ['order' => $result['data']]);
         } else {
             return abort(404);
         }

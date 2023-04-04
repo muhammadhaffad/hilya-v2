@@ -166,6 +166,19 @@ class CheckoutServiceImplement implements CheckoutService
     }
     public function getAllShippingCost(): array
     {
+            // return [
+            //     'code' => 200,
+            //     'message' => 'Sukses mendapatkan harga ongkir',
+            //     'data' => [
+            //         [
+            //             'courier' => 'Jalur Nugraha Ekakurir (JNE)', 
+            //             'services' => ['OKE' => 10000,'REG' => 20000]
+            //         ], [
+            //             'courier' => 'POS Indonesia', 
+            //             'services' => ['POS Reguler' => 7000,'POS Kargo' => 3000]
+            //         ]
+            //     ]
+            // ];
         try {
             $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']]);
             $address = ShippingAddress::where('user_id', auth()->user()->id);
@@ -291,7 +304,7 @@ class CheckoutServiceImplement implements CheckoutService
                     $productsPromo = $checkoutInformation->productItems
                         ->filter( fn($item) => $item->product->ispromo == 1)
                         ->map(fn($item) => ['id'=>$item->id, 'price'=>$item->price, 'discount'=>$item->discount])
-                        ->toJson();
+                        ->toArray();
                     $checkoutInformation->update([
                         'status' => $transaction['transaction_status'],
                         'custom_properties' => $productsPromo

@@ -39,7 +39,7 @@ class CheckoutController extends Controller
         } else {
             abort(404);
         }
-        return view('checkout.index', compact('checkoutItems', 'addresses', 'shippingCost'));
+        return view('v2.checkout.index', compact('checkoutItems', 'addresses', 'shippingCost'));
     }
     public function changeAddressShipping(Request $request)
     {
@@ -54,6 +54,14 @@ class CheckoutController extends Controller
     }
     public function placeOrder(Request $request)
     {
+        $result = $this->checkoutService->hasNoCheckout();
+        if ($result) {
+            return redirect()->route('customer.cart')->with('message', $result['message']);
+        }
+        $hasUnavailableProducts = $this->checkoutService->checkUnvailableProducts();
+        if ($hasUnavailableProducts) {
+            return redirect()->back()->withErrors($hasUnavailableProducts['errors'], 'checkoutItemErrors');
+        }
         $result = $this->checkoutService->placeOrder($request->all());
         if ($result['code'] == 201) {
             return redirect()->route('customer.orders.show', $result['data'])->with('message', $result['message']);

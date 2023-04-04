@@ -6,6 +6,7 @@ use App\Http\Controllers\CartPage\Cart;
 use App\Services\Cart\CartService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use stdClass;
 
 class CartController extends Controller
 {
@@ -37,9 +38,9 @@ class CartController extends Controller
         }
         $cart = $this->cartService->getCart();
         if ($cart['code'] == 200) {
-            return view('cart.index', ['cart' => $cart['data']]);
+            return view('v2.cart.index', ['cartItems' => $cart['data']]);
         } else {
-            return abort(404);
+            return view('v2.cart.index', ['cartItems' => (object)['orderItems'=>[]]]);
         }
     }
 

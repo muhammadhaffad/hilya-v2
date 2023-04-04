@@ -202,14 +202,17 @@ class CartServiceImplement implements CartService
     {
         DB::beginTransaction();
         try {
-            $orderItem = Order::where([['user_id', auth()->user()->id], ['status', 'cart']])
-                ->first()->orderItems()->find($orderItemId);
+            $cart = Order::where([['user_id', auth()->user()->id], ['status', 'cart']]);
+            $orderItem = $cart->first()->orderItems()->find($orderItemId);
             if (!$orderItem)
                 return [
                     'code' => 404,
                     'message' => 'Tidak ada data'
                 ];
             $orderItem->delete();
+            if ($cart->first()->orderItems()->count() == 0) {
+                $cart->delete();
+            }
             DB::commit();
             return [
                 'code' => 204,

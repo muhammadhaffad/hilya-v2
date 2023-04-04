@@ -101,7 +101,7 @@ class OrderServiceImplement implements OrderService
             ->distinct();
         if (@$criteria['search']) {
             $orders->where(function ($query) use ($criteria) {
-                $query->where('payment.order_code', 'LIKE', '%' . $criteria['search'] . '%')
+                $query->where('payments.order_code', 'LIKE', '%' . $criteria['search'] . '%')
                     ->orWhere('product_items.gender', 'LIKE', '%' . $criteria['search'] . '%')
                     ->orWhere('product_items.age', 'LIKE', '%' . $criteria['search'] . '%')
                     ->orWhere('product_brands.name', 'LIKE', '%' . $criteria['search'] . '%')
@@ -138,5 +138,28 @@ class OrderServiceImplement implements OrderService
                 'message' => 'Tidak ada data'
             ];
         }
+    }
+
+    public function getCountOrder() : array
+    { 
+        $cartTotal = Order::where([['status','cart'], ['user_id', auth()->user()->id]])
+            ->withCount('orderItems')
+            ->first()
+            ?->order_items_count ?? 0;
+        $unpaidTotal = Order::where([['status','pending'], ['user_id', auth()->user()->id]])->count();
+        $paidTotal = Order::where([['status','paid'], ['user_id', auth()->user()->id]])->count();
+        $readyTotal = Order::where([['status','ready'], ['user_id', auth()->user()->id]])->count();
+        $shippingTotal = Order::where([['status','shipping'], ['user_id', auth()->user()->id]])->count();
+        return [
+            'code' => 200,
+            'message' => 'Sukses mendapatkan data jumlah order',
+            'data' => [
+                'Keranjang' => $cartTotal,
+                'Belum Bayar' => $unpaidTotal,
+                'Menunggu Konfirmasi' => $paidTotal,
+                'Sudah Diproses' => $readyTotal,
+                'Dalam Pengiriman' => $shippingTotal
+            ]
+        ];         
     }
 }

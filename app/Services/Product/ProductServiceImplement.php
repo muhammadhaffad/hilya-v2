@@ -37,34 +37,48 @@ class ProductServiceImplement implements ProductService
         $products = Product::whereHas('productItems', fn ($q) => $q->inStock())
             ->with(['productImages:product_id,id,image', 'productBrand:id,name'])
             ->withMin('productItems', 'price')
-            ->withMax('productItems', 'price');
+            ->withMax('productItems', 'price')
+            ->latest();
         if ($offset !== null && $limit !== null) {
-            $productsLimit = $products->offset($offset)->limit($limit)->get();
-            return array(
-                'code' => $productsLimit ? 200 : 404,
-                'data' => $productsLimit->all()
-            );
+            if ($limit < 0)
+                $limit = 0;
+            if ($limit > 40)
+                $limit = 40;
+            $productsLimit = $products->limit($limit)->get();
+            if (!$productsLimit->isEmpty()) {
+                return [
+                    'code' => 200,
+                    'message' => 'Sukses mendapatkan data products',
+                    'data' => $productsLimit
+                ];
+            } else {
+                return [
+                    'code' => 404,
+                    'message' => 'Tidak ada data'
+                ];
+            }
         }
         if ($paginate !== null) {
-            $productsPagination = $products->simplePaginate($paginate)->withQueryString();
-            return array(
-                'code' => $productsPagination->items() ? 200 : 404,
-                'data' => $productsPagination->items(),
-                'page' => array(
-                    'total' => $products->count(),
-                    'total_per_pages' => $paginate,
-                    'total_pages' => (int) ceil($products->count() / $paginate),
-                    'previous_page_url' => $productsPagination->previousPageUrl(),
-                    'current_page' => $productsPagination->currentPage(),
-                    'next_page_url' => $productsPagination->nextPageUrl(),
-                )
-            );
+            $productsPagination = $products->cursorPaginate($paginate)->withQueryString();
+            if (!$productsPagination) {
+                return [
+                    'code' => 200,
+                    'message' => 'Sukses mendapatkan data products',
+                    'data' => $productsPagination
+                ];
+            } else {
+                return [
+                    'code' => 404,
+                    'message' => 'Tidak ada data'
+                ];
+            }
         }
         $products = $products->get();
-        return array(
-            'code' => $products->all() ? 200 : 404,
-            'data' => $products->all()
-        );
+        return [
+            'code' => 200,
+            'message' => 'Sukses mendapatkan data products',
+            'data' => $products
+        ];
     }
 
     /**
@@ -81,34 +95,48 @@ class ProductServiceImplement implements ProductService
         $products = Product::{$availability}()->whereHas('productItems', fn ($q) => $q->inStock())
             ->with(['productImages:product_id,id,image', 'productBrand:id,name'])
             ->withMin('productItems', 'price')
-            ->withMax('productItems', 'price');
+            ->withMax('productItems', 'price')
+            ->latest();
         if ($offset !== null && $limit !== null) {
-            $productsLimit = $products->offset($offset)->limit($limit)->get();
-            return array(
-                'code' => $productsLimit ? 200 : 404,
-                'data' => $productsLimit->all()
-            );
+            if ($limit < 0)
+                $limit = 0;
+            if ($limit > 40)
+                $limit = 40;
+            $productsLimit = $products->limit($limit)->get();
+            if (!$productsLimit->isEmpty()) {
+                return [
+                    'code' => 200,
+                    'message' => 'Sukses mendapatkan data products',
+                    'data' => $productsLimit
+                ];
+            } else {
+                return [
+                    'code' => 404,
+                    'message' => 'Tidak ada data'
+                ];
+            }
         }
         if ($paginate !== null) {
-            $productsPagination = $products->simplePaginate($paginate)->withQueryString();
-            return array(
-                'code' => $productsPagination->items() ? 200 : 404,
-                'data' => $productsPagination->items(),
-                'page' => array(
-                    'total' => $products->count(),
-                    'total_per_pages' => $paginate,
-                    'total_pages' => (int) ceil($products->count() / $paginate),
-                    'previous_page_url' => $productsPagination->previousPageUrl(),
-                    'current_page' => $productsPagination->currentPage(),
-                    'next_page_url' => $productsPagination->nextPageUrl(),
-                )
-            );
+            $productsPagination = $products->cursorPaginate($paginate)->withQueryString();
+            if (!$productsPagination) {
+                return [
+                    'code' => 200,
+                    'message' => 'Sukses mendapatkan data products',
+                    'data' => $productsPagination
+                ];
+            } else {
+                return [
+                    'code' => 404,
+                    'message' => 'Tidak ada data'
+                ];
+            }
         }
         $products = $products->get();
-        return array(
-            'code' => $products->all() ? 200 : 404,
-            'data' => $products->all()
-        );
+        return [
+            'code' => 200,
+            'message' => 'Sukses mendapatkan data products',
+            'data' => $products
+        ];
     }
 
     /**
@@ -124,34 +152,48 @@ class ProductServiceImplement implements ProductService
         $products = Product::promo()->whereHas('productItems', fn ($q) => $q->inStock())
             ->with(['productImages:product_id,id,image', 'productBrand:id,name'])
             ->withMin('productItems', 'price')
-            ->withMax('productItems', 'price');
+            ->withMax('productItems', 'price')
+            ->latest();
         if ($offset !== null && $limit !== null) {
-            $productsLimit = $products->offset($offset)->limit($limit)->get();
-            return array(
-                'code' => $productsLimit ? 200 : 404,
-                'data' => $productsLimit->all()
-            );
+            if ($limit < 0)
+                $limit = 0;
+            if ($limit > 40)
+                $limit = 40;
+            $productsLimit = $products->limit($limit)->get();
+            if (!$productsLimit->isEmpty()) {
+                return [
+                    'code' => 200,
+                    'message' => 'Sukses mendapatkan data products',
+                    'data' => $productsLimit
+                ];
+            } else {
+                return [
+                    'code' => 404,
+                    'message' => 'Tidak ada data'
+                ];
+            }
         }
         if ($paginate !== null) {
-            $productsPagination = $products->simplePaginate($paginate)->withQueryString();
-            return array(
-                'code' => $productsPagination->items() ? 200 : 404,
-                'data' => $productsPagination->items(),
-                'page' => array(
-                    'total' => $products->count(),
-                    'total_per_pages' => $paginate,
-                    'total_pages' => (int) ceil($products->count() / $paginate),
-                    'previous_page_url' => $productsPagination->previousPageUrl(),
-                    'current_page' => $productsPagination->currentPage(),
-                    'next_page_url' => $productsPagination->nextPageUrl(),
-                )
-            );
+            $productsPagination = $products->cursorPaginate($paginate)->withQueryString();
+            if (!$productsPagination) {
+                return [
+                    'code' => 200,
+                    'message' => 'Sukses mendapatkan data products',
+                    'data' => $productsPagination
+                ];
+            } else {
+                return [
+                    'code' => 404,
+                    'message' => 'Tidak ada data'
+                ];
+            }
         }
         $products = $products->get();
-        return array(
-            'code' => $products->all() ? 200 : 404,
-            'data' => $products->all()
-        );
+        return [
+            'code' => 200,
+            'message' => 'Sukses mendapatkan data products',
+            'data' => $products
+        ];
     }
     /**
      * getProductsByBrand
@@ -167,36 +209,50 @@ class ProductServiceImplement implements ProductService
         $products = Product::withBrand($brandIds)->whereHas('productItems', fn ($q) => $q->inStock())
             ->with(['productImages:product_id,id,image', 'productBrand:id,name'])
             ->withMin('productItems', 'price')
-            ->withMax('productItems', 'price');
+            ->withMax('productItems', 'price')
+            ->latest();
         if ($offset !== null && $limit !== null) {
-            $productsLimit = $products->offset($offset)->limit($limit)->get();
-            return array(
-                'code' => $productsLimit->all() ? 200 : 404,
-                'data' => $productsLimit->all()
-            );
+            if ($limit < 0)
+                $limit = 0;
+            if ($limit > 40)
+                $limit = 40;
+            $productsLimit = $products->limit($limit)->get();
+            if (!$productsLimit->isEmpty()) {
+                return [
+                    'code' => 200,
+                    'message' => 'Sukses mendapatkan data products',
+                    'data' => $productsLimit
+                ];
+            } else {
+                return [
+                    'code' => 404,
+                    'message' => 'Tidak ada data'
+                ];
+            }
         }
         if ($paginate !== null) {
-            $productsPagination = $products->simplePaginate($paginate)->withQueryString();
-            return array(
-                'code' => $productsPagination->items() ? 200 : 404,
-                'data' => $productsPagination->items(),
-                'page' => array(
-                    'total' => $products->count(),
-                    'total_per_pages' => $paginate,
-                    'total_pages' => (int) ceil($products->count() / $paginate),
-                    'previous_page_url' => $productsPagination->previousPageUrl(),
-                    'current_page' => $productsPagination->currentPage(),
-                    'next_page_url' => $productsPagination->nextPageUrl(),
-                )
-            );
+            $productsPagination = $products->cursorPaginate($paginate)->withQueryString();
+            if (!$productsPagination) {
+                return [
+                    'code' => 200,
+                    'message' => 'Sukses mendapatkan data products',
+                    'data' => $productsPagination
+                ];
+            } else {
+                return [
+                    'code' => 404,
+                    'message' => 'Tidak ada data'
+                ];
+            }
         }
         $products = $products->get();
-        return array(
-            'code' => $products->all(),
-            'data' => $products->all()
-        );
+        return [
+            'code' => 200,
+            'message' => 'Sukses mendapatkan data products',
+            'data' => $products
+        ];
     }
-        
+
     /**
      * getProduct
      *
@@ -255,19 +311,33 @@ class ProductServiceImplement implements ProductService
             ->where('product_items.stock', '>', 0)
             ->withMin('productItems', 'price')
             ->withMax('productItems', 'price')
-            ->with(['productBrand:id,name', 'productImages:product_id,image']);
+            ->with(['productBrand:id,name', 'productImages:product_id,image'])
+            ->latest();
         if ($offset !== null && $limit !== null) {
-            $productsLimit = $products->offset($offset)->limit($limit)->get();
-            return array(
-                'code' => $productsLimit->all() ? 200 : 404,
-                'data' => $productsLimit->all()
-            );
+            if ($limit < 0)
+                $limit = 0;
+            if ($limit > 40)
+                $limit = 40;
+            $productsLimit = $products->limit($limit)->get();
+            if (!$productsLimit->isEmpty()) {
+                return [
+                    'code' => 200,
+                    'message' => 'Sukses mendapatkan data products',
+                    'data' => $productsLimit
+                ];
+            } else {
+                return [
+                    'code' => 404,
+                    'message' => 'Tidak ada data'
+                ];
+            }
         }
         $products = $products->get();
-        return array(
-            'code' => $products->all() ? 200 : 404,
-            'data' => $products->all()
-        );
+        return [
+            'code' => 200,
+            'message' => 'Sukses mendapatkan data products',
+            'data' => $products
+        ];
     }
     /**
      * searchProductsPromo
@@ -293,27 +363,29 @@ class ProductServiceImplement implements ProductService
             ->where('product_items.stock', '>', 0)
             ->withMin('productItems', 'price')
             ->withMax('productItems', 'price')
-            ->with(['productBrand:id,name', 'productImages:product_id,image']);
+            ->with(['productBrand:id,name', 'productImages:product_id,image'])
+            ->latest();
         if ($paginate !== null) {
-            $productsPagination = $products->simplePaginate($paginate)->withQueryString();
-            return array(
-                'code' => $productsPagination->items() ? 200 : 404,
-                'data' => $productsPagination->items(),
-                'page' => array(
-                    'total' => $products->count(),
-                    'total_per_pages' => $paginate,
-                    'total_pages' => (int) ceil($products->count() / $paginate),
-                    'previous_page_url' => $productsPagination->previousPageUrl(),
-                    'current_page' => $productsPagination->currentPage(),
-                    'next_page_url' => $productsPagination->nextPageUrl(),
-                )
-            );
+            $productsPagination = $products->cursorPaginate($paginate)->withQueryString();
+            if (!$productsPagination) {
+                return [
+                    'code' => 200,
+                    'message' => 'Sukses mendapatkan data products',
+                    'data' => $productsPagination
+                ];
+            } else {
+                return [
+                    'code' => 404,
+                    'message' => 'Tidak ada data'
+                ];
+            }
         }
         $products = $products->get();
-        return array(
-            'code' => $products->all() ? 200 : 404,
-            'data' => $products->all()
-        );
+        return [
+            'code' => 200,
+            'message' => 'Sukses mendapatkan data products',
+            'data' => $products
+        ];
     }
     /**
      * searchProductsByAvailability
@@ -347,27 +419,29 @@ class ProductServiceImplement implements ProductService
             ->where('product_items.stock', '>', 0)
             ->withMin('productItems', 'price')
             ->withMax('productItems', 'price')
-            ->with(['productBrand:id,name', 'productImages:product_id,image']);
+            ->with(['productBrand:id,name', 'productImages:product_id,image'])
+            ->latest();
         if ($paginate !== null) {
-            $productsPagination = $products->simplePaginate($paginate)->withQueryString();
-            return array(
-                'code' => $productsPagination->items() ? 200 : 404,
-                'data' => $productsPagination->items(),
-                'page' => array(
-                    'total' => $products->count(),
-                    'total_per_pages' => $paginate,
-                    'total_pages' => (int) ceil($products->count() / $paginate),
-                    'previous_page_url' => $productsPagination->previousPageUrl(),
-                    'current_page' => $productsPagination->currentPage(),
-                    'next_page_url' => $productsPagination->nextPageUrl(),
-                )
-            );
+            $productsPagination = $products->cursorPaginate($paginate)->withQueryString();
+            if (!$productsPagination) {
+                return [
+                    'code' => 200,
+                    'message' => 'Sukses mendapatkan data products',
+                    'data' => $productsPagination
+                ];
+            } else {
+                return [
+                    'code' => 404,
+                    'message' => 'Tidak ada data'
+                ];
+            }
         }
         $products = $products->get();
-        return array(
-            'code' => $products->all() ? 200 : 404,
-            'data' => $products->all()
-        );
+        return [
+            'code' => 200,
+            'message' => 'Sukses mendapatkan data products',
+            'data' => $products
+        ];
     }
     /**
      * searchProductsByBrand
@@ -401,26 +475,28 @@ class ProductServiceImplement implements ProductService
             ->where('product_items.stock', '>', 0)
             ->withMin('productItems', 'price')
             ->withMax('productItems', 'price')
-            ->with(['productBrand:id,name', 'productImages:product_id,image']);
+            ->with(['productBrand:id,name', 'productImages:product_id,image'])
+            ->latest();
         if ($paginate !== null) {
-            $productsPagination = $products->simplePaginate($paginate)->withQueryString();
-            return array(
-                'code' => $productsPagination->items() ? 200 : 404,
-                'data' => $productsPagination->items(),
-                'page' => array(
-                    'total' => $products->count(),
-                    'total_per_pages' => $paginate,
-                    'total_pages' => (int) ceil($products->count() / $paginate),
-                    'previous_page_url' => $productsPagination->previousPageUrl(),
-                    'current_page' => $productsPagination->currentPage(),
-                    'next_page_url' => $productsPagination->nextPageUrl(),
-                )
-            );
+            $productsPagination = $products->cursorPaginate($paginate)->withQueryString();
+            if (!$productsPagination) {
+                return [
+                    'code' => 200,
+                    'message' => 'Sukses mendapatkan data products',
+                    'data' => $productsPagination
+                ];
+            } else {
+                return [
+                    'code' => 404,
+                    'message' => 'Tidak ada data'
+                ];
+            }
         }
         $products = $products->get();
-        return array(
-            'code' => $products->all() ? 200 : 404,
-            'data' => $products->all()
-        );
+        return [
+            'code' => 200,
+            'message' => 'Sukses mendapatkan data products',
+            'data' => $products
+        ];
     }
 }
