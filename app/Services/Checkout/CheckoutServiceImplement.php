@@ -46,19 +46,59 @@ class CheckoutServiceImplement implements CheckoutService
      */
     public function checkUnvailableProducts(): mixed
     {
-        $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']]);
-        $checkoutItems = $checkout->join('order_items', 'order_id', 'orders.id')
-            ->join('product_items', function ($join) {
-                $join->on('product_items.id', '=', 'order_items.product_item_id')
-                    ->on('product_items.stock', '<', 'order_items.qty');
-            })->get()
-            ->mapWithKeys(fn ($item) => ['checkout.' . $item->id => ['Produk item kosong atau jumlah pesanan melebihi stok']])
-            ->toArray();
-        if ($checkoutItems)
+        /* TODO : Optimasi pengecekan untuk product bundle */
+        DB::beginTransaction();
+        $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']])->first()->load([
+            'orderItems' => [
+                'productItem' => [
+                    'productOrigins',
+                    'product' => [
+                        'productBrand',
+                        'productImage'
+                    ]
+                ],
+                'product' => [
+                    'productItems'
+                ]
+            ],
+            'payment',
+            'shipping' => [
+                'shippingAddress'
+            ],
+            'productItems'
+        ]);
+        $unavailableProducts = [];
+        foreach ($checkout->orderItems as $orderItem ) {
+            if ($orderItem->productItem->is_bundle) {
+                foreach ($orderItem->productItem->productOrigins as $productOrigin) {
+                    $productOrigin->decrement('stock', $orderItem->qty);
+                }
+            } 
+        }
+        foreach ($checkout->orderItems as $orderItem ) {
+            foreach ($orderItem->product->productItems as $productItem) {
+                if ($productItem->is_bundle) {
+                    $productItem->update([
+                        'stock' => $productItem->productOrigins()->min('stock')
+                    ]);
+                    if ($productItem->stock < 0) {
+                        $unavailableProducts['checkout.' . $orderItem->id] = ['Produk item kosong atau jumlah pesanan melebihi stok'];
+                    }
+                }
+            }
+            if (!$orderItem->productItem->is_bundle) {
+                $orderItem->productItem->decrement('stock', $orderItem->qty);
+                if ($productItem->stock < 0) {
+                    $unavailableProducts['checkout.' . $orderItem->id] = ['Produk item kosong atau jumlah pesanan melebihi stok'];
+                }
+            }
+        }
+        DB::rollBack();
+        if ($unavailableProducts)
             return [
                 'code' => 422,
                 'message' => 'Checkout item tidak valid',
-                'errors' => $checkoutItems
+                'errors' => $unavailableProducts
             ];
         else
             return false;
@@ -241,6 +281,9 @@ class CheckoutServiceImplement implements CheckoutService
                         'productBrand',
                         'productImage'
                     ]
+                ],
+                'product' => [
+                    'productItems'
                 ]
             ],
             'payment',
@@ -293,6 +336,18 @@ class CheckoutServiceImplement implements CheckoutService
                         } 
                     }
                     foreach ($checkoutInformation->orderItems as $orderItem ) {
+                        foreach ($orderItem->product->productItems as $productItem) {
+                            if ($productItem->is_bundle) {
+                                $productItem->update([
+                                    'stock' => $productItem->productOrigins()->min('stock')
+                                ]);
+                            }
+                        }
+                        if (!$orderItem->productItem->is_bundle) {
+                            $orderItem->productItem->decrement('stock', $orderItem->qty);
+                        }
+                    }
+                    /* foreach ($checkoutInformation->orderItems as $orderItem ) {
                         if ($orderItem->productItem->is_bundle) {
                             $orderItem->productItem->update([
                                 'stock' => $orderItem->productItem->productOrigins->min('stock')
@@ -300,14 +355,13 @@ class CheckoutServiceImplement implements CheckoutService
                         } else {
                             $orderItem->productItem->decrement('stock', $orderItem->qty);
                         }
-                    }
-                    $productsPromo = $checkoutInformation->productItems
-                        ->filter( fn($item) => $item->product->ispromo == 1)
+                    } */
+                    $productItems = $checkoutInformation->productItems
                         ->map(fn($item) => ['id'=>$item->id, 'price'=>$item->price, 'discount'=>$item->discount])
                         ->toArray();
                     $checkoutInformation->update([
                         'status' => $transaction['transaction_status'],
-                        'custom_properties' => $productsPromo
+                        'custom_properties' => $productItems
                     ]);
                     DB::commit();
                     return [

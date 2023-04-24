@@ -24,6 +24,9 @@ class Product extends Model
     public function productImage() {
         return $this->hasOne(ProductImage::class)->ofMany('id', 'MIN');
     }
+    public function productOrigins() {
+        return $this->hasMany(ProductOrigin::class);
+    }
 
     public function productItems() {
         return $this->hasMany(ProductItem::class);

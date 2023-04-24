@@ -4,6 +4,7 @@ namespace App\Services\Order;
 
 use App\Models\Order;
 use App\Models\Payment;
+use Illuminate\Support\Facades\DB;
 
 class OrderServiceImplement implements OrderService
 {
@@ -29,14 +30,25 @@ class OrderServiceImplement implements OrderService
      */
     public function getOrders(int $userId): array
     {
-        $orders = Order::where('user_id', $userId)->withoutStatus(['cart', 'checkout'])
-            ->whereDate('created_at', '>=', now()->subDays(30))
-            ->with([
-                'orderItems.productItem.product:id,product_brand_id,name',
-                'orderItems.productItem.product.productImage',
-                'orderItems.productItem.product.productBrand',
-                'payment:id,order_id,transactiontime,settlementtime,amount'
-            ])->orderBy('created_at', 'desc')->get();
+        if ($userId == 0) {
+            $orders = Order::withoutStatus(['cart', 'checkout'])
+                ->whereDate('created_at', '>=', now()->subDays(30))
+                ->with([
+                    'orderItems.productItem.product:id,product_brand_id,name',
+                    'orderItems.productItem.product.productImage',
+                    'orderItems.productItem.product.productBrand',
+                    'payment:id,order_id,transactiontime,settlementtime,amount'
+                ])->orderBy('created_at', 'desc')->get();
+        } else {
+            $orders = Order::where('user_id', $userId)->withoutStatus(['cart', 'checkout'])
+                ->whereDate('created_at', '>=', now()->subDays(30))
+                ->with([
+                    'orderItems.productItem.product:id,product_brand_id,name',
+                    'orderItems.productItem.product.productImage',
+                    'orderItems.productItem.product.productBrand',
+                    'payment:id,order_id,transactiontime,settlementtime,amount'
+                ])->orderBy('created_at', 'desc')->get();
+        }
         if($orders) {
             return [
                 'code' => 200,
@@ -60,13 +72,23 @@ class OrderServiceImplement implements OrderService
      */
     public function getDetailOrder(int $userId, string $code): array
     {
-        $order = Payment::where('order_code', $code)->first()->order()->where('user_id', $userId)->with([
-            'user:id,fullname',
-            'orderItems.productItem.product.productImage',
-            'orderItems.productItem.product.productBrand',
-            'shipping.shippingAddress',
-            'payment'
-        ])->first();
+        if ($userId == 0) {
+            $order = Payment::where('order_code', $code)->first()->order()->with([
+                'user:id,fullname',
+                'orderItems.productItem.product.productImage',
+                'orderItems.productItem.product.productBrand',
+                'shipping.shippingAddress',
+                'payment'
+            ])->first();
+        } else {
+            $order = Payment::where('order_code', $code)->first()->order()->where('user_id', $userId)->with([
+                'user:id,fullname',
+                'orderItems.productItem.product.productImage',
+                'orderItems.productItem.product.productBrand',
+                'shipping.shippingAddress',
+                'payment'
+            ])->first();
+        }
         $order['total_discount'] = $this->calcDiscount($code);
         if ($order) {
             return [
@@ -91,14 +113,25 @@ class OrderServiceImplement implements OrderService
      */
     public function searchOrders(int $userId, $criteria): array
     {
-        $orders = Order::where('user_id', $userId)->withoutStatus(['cart', 'checkout'])
-            ->join('payments', 'payments.order_id', 'orders.id')
-            ->join('order_items', 'order_items.order_id', 'orders.id')
-            ->join('product_items', 'product_items.id', 'order_items.product_item_id')
-            ->join('products', 'products.id', 'product_items.product_id')
-            ->join('product_brands', 'product_brands.id', 'products.product_brand_id')
-            ->select('orders.*')
-            ->distinct();
+        if ($userId == 0) {
+            $orders = Order::withoutStatus(['cart', 'checkout'])
+                ->join('payments', 'payments.order_id', 'orders.id')
+                ->join('order_items', 'order_items.order_id', 'orders.id')
+                ->join('product_items', 'product_items.id', 'order_items.product_item_id')
+                ->join('products', 'products.id', 'product_items.product_id')
+                ->join('product_brands', 'product_brands.id', 'products.product_brand_id')
+                ->select('orders.*')
+                ->distinct();
+        } else {
+            $orders = Order::where('user_id', $userId)->withoutStatus(['cart', 'checkout'])
+                ->join('payments', 'payments.order_id', 'orders.id')
+                ->join('order_items', 'order_items.order_id', 'orders.id')
+                ->join('product_items', 'product_items.id', 'order_items.product_item_id')
+                ->join('products', 'products.id', 'product_items.product_id')
+                ->join('product_brands', 'product_brands.id', 'products.product_brand_id')
+                ->select('orders.*')
+                ->distinct();
+        }
         if (@$criteria['search']) {
             $orders->where(function ($query) use ($criteria) {
                 $query->where('payments.order_code', 'LIKE', '%' . $criteria['search'] . '%')
@@ -161,5 +194,107 @@ class OrderServiceImplement implements OrderService
                 'Dalam Pengiriman' => $shippingTotal
             ]
         ];         
+    }
+
+    public function setDelivered(int $userId, string $code): array
+    {
+        $order = Payment::where('order_code', $code)->first()->order()->where('user_id', $userId)->first();
+        if ($order) {
+            DB::beginTransaction();
+            try {
+                $order->status = 'delivered';
+                $order->save();
+                DB::commit();
+                return [
+                    'code' => 204,
+                    'message' => 'Sukses memperbarui status'
+                ];
+            } catch (\Throwable $th) {
+                DB::rollBack();
+                throw $th;
+            }
+        } else {
+            return [
+                'code' => 404,
+                'message' => 'Tidak ada data'
+            ];
+        }
+    }
+
+    public function setProcessing(string $code): array
+    {
+        $order = Payment::where('order_code', $code)->first()->order()->first();
+        if ($order) {
+            DB::beginTransaction();
+            try {
+                $order->status = 'processing';
+                $order->save();
+                DB::commit();
+                return [
+                    'code' => 204,
+                    'message' => 'Sukses memperbarui status'
+                ];
+            } catch (\Throwable $th) {
+                DB::rollBack();
+                throw $th;
+            }
+        } else {
+            return [
+                'code' => 404,
+                'message' => 'Tidak ada data'
+            ];
+        }
+    }
+
+    public function setShipping(string $code, array $attr): array
+    {
+        $order = Payment::where('order_code', $code)->first()->order()->first();
+        if ($order) {
+            DB::beginTransaction();
+            try {
+                $order->status = 'shipping';
+                $order->save();
+                $order->shipping->trackingnumber = $attr['trackingnumber'];
+                $order->shipping->save();
+                DB::commit();
+                return [
+                    'code' => 204,
+                    'message' => 'Sukses memperbarui status'
+                ];
+            } catch (\Throwable $th) {
+                DB::rollBack();
+                throw $th;
+            }
+        } else {
+            return [
+                'code' => 404,
+                'message' => 'Tidak ada data'
+            ];
+        }
+    }
+
+    public function setSuccess(string $code): array
+    {
+        $order = Payment::where('order_code', $code)->first()->order()->first();
+        if ($order) {
+            DB::beginTransaction();
+            try {
+                $order->status = 'success';
+                $order->save();
+                DB::commit();
+                return [
+                    'code' => 204,
+                    'message' => 'Sukses memperbarui status'
+                ];
+            } catch (\Throwable $th) {
+                DB::rollBack();
+                throw $th;
+            }
+        } else {
+            return [
+                'code' => 404,
+                'message' => 'Tidak ada data'
+            ];
+        }
     }
 }

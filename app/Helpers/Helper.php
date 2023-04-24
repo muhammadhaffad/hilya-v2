@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+use App\Models\ProductBrand;
+
 class Helper
 {
     public static function rupiah($number)
@@ -50,5 +52,10 @@ class Helper
     public static function getSubdistrict($subdistricts, $subdistrict_id)
     {
         return $subdistricts->where('subdistrict_id', $subdistrict_id)->pluck('subdistrict_name')->first();
+    }
+
+    public static function getBrands() 
+    {
+        return ProductBrand::all();
     }
 }

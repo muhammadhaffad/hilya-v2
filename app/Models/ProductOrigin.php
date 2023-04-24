@@ -9,6 +9,8 @@ class ProductOrigin extends Model
 {
     use HasFactory;
 
+    protected $guarded = ['id'];
+
     public function productItems() {
         return $this->belongsToMany(ProductItem::class, 'product_relations');
     }

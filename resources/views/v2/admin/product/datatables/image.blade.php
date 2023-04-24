@@ -1,0 +1,1 @@
+<img src="{{asset('storage/'.$data->productImage->image)}}" alt="" class="w-24">

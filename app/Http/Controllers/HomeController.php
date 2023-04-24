@@ -20,13 +20,32 @@ class HomeController extends Controller
         $this->productService = $productService;
         $this->productBrandService = $productBrandService;
     }
-    public function index()
+    public function index(Request $request)
     {
-        $slides = $this->productService->getProductsByAvailability('ready', 0, 2);
-        $productBrands = $this->productBrandService->getAllBrand();
-        $readyProducts = $this->productService->getProductsByAvailability('ready', 0, 4);
-        $promoProducts = $this->productService->getProductsPromo(0, 4);
-        $preorderProducts = $this->productService->getProductsByAvailability('preorder', 0, 4);
-        return response()->json(compact('slides', 'productBrands', 'readyProducts', 'promoProducts', 'preorderProducts'));
+        $result = $this->productBrandService->getAllBrand();
+        if ($result['code'] == 200) {
+            $productBrands = $result['data'];
+        } else {
+            $productBrands = [];
+        }
+        $result = $this->productService->getProductsByAvailability('ready', 0, $request->get('limit') ?? 10);
+        if ($result['code'] == 200) {
+            $readyProducts = $result['data'];
+        } else {
+            $readyProducts = [];
+        }
+        $result = $this->productService->getProductsPromo(0, 10);
+        if ($result['code'] == 200) {
+            $promoProducts = $result['data'];
+        } else {
+            $promoProducts = [];
+        }
+        $result = $this->productService->getProductsByAvailability('preorder', 0, 10);
+        if ($result['code'] == 200) {
+            $preorderProducts = $result['data'];
+        } else {
+            $preorderProducts = [];
+        }
+        return view('v2.public.index', compact('productBrands', 'readyProducts', 'promoProducts', 'preorderProducts'));
     }
 }
