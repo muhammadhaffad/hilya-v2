@@ -14,4 +14,9 @@ interface ProductService
     public function searchProductsPromo($criteria, int $paginate = null) : array;
     public function searchProductsByAvailability($criteria, string $availability, int $paginate = null) : array;
     public function searchProductsByBrand($criteria, array $brandIds, int $paginate = null) : array;
+
+    public function createProduct($attr) : array;
+    public function updateProduct($id, $attr) : array;
+    public function showProduct($id) : array;
+    public function deleteProduct($id) : array;
 }

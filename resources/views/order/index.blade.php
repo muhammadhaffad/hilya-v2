@@ -35,7 +35,7 @@
             <table>
                 <tr>
                     <th colspan="9">
-                        Kode : {{ $order->code }}
+                        Kode : {{ $order->payment->order_code }}
                     </th>
                 </tr>
                 @php $custom_properties = collect($order->custom_properties); @endphp
@@ -48,7 +48,7 @@
                 <tr>
                     <td colspan="2">{{ $order->status }}</td>
                     <td colspan="2">{{ $order->payment->transactiontime }}</td>
-                    <td colspan="2">{{ $order->payment->setlementtime ?? '-' }}</td>
+                    <td colspan="2">{{ $order->payment->settlementtime ?? '-' }}</td>
                     <td colspan="3">{{ $order->payment->amount }}</td>
                 </tr>
                 <tr>
@@ -88,7 +88,7 @@
                 </tr>
                 @endforeach
             </table>
-            <button style="margin-bottom: 32px" onclick="window.location='{{ route('customer.orders.show', ['code' => $order->code]) }}'">Lihat Detail</button>
+            <button style="margin-bottom: 32px" onclick="window.location='{{ route('customer.orders.show', ['code' => ($order->payment?->order_code ?: '-')]) }}'">Lihat Detail</button>
         @endforeach
     </section>
 @endsection

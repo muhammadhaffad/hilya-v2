@@ -11,6 +11,10 @@ class User extends Authenticatable
 
     protected $guarded = ['id'];
 
+    protected $hidden = [
+        'password'
+    ];
+
     public function shippingAddresses() {
         return $this->hasMany(ShippingAddress::class);
     }

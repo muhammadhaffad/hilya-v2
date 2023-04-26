@@ -3,6 +3,7 @@
 namespace App\Services\Checkout;
 
 use App\Models\Order;
+use App\Models\ProductItem;
 use App\Models\ProductOrigin;
 use App\Models\ShippingAddress;
 use App\Services\Payment\PaymentService;
@@ -45,19 +46,59 @@ class CheckoutServiceImplement implements CheckoutService
      */
     public function checkUnvailableProducts(): mixed
     {
-        $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']]);
-        $checkoutItems = $checkout->join('order_items', 'order_id', 'orders.id')
-            ->join('product_items', function ($join) {
-                $join->on('product_items.id', '=', 'order_items.product_item_id')
-                    ->on('product_items.stock', '<', 'order_items.qty');
-            })->get()
-            ->mapWithKeys(fn ($item) => ['checkout.' . $item->id => ['Produk item kosong atau jumlah pesanan melebihi stok']])
-            ->toArray();
-        if ($checkoutItems)
+        /* TODO : Optimasi pengecekan untuk product bundle */
+        DB::beginTransaction();
+        $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']])->first()->load([
+            'orderItems' => [
+                'productItem' => [
+                    'productOrigins',
+                    'product' => [
+                        'productBrand',
+                        'productImage'
+                    ]
+                ],
+                'product' => [
+                    'productItems'
+                ]
+            ],
+            'payment',
+            'shipping' => [
+                'shippingAddress'
+            ],
+            'productItems'
+        ]);
+        $unavailableProducts = [];
+        foreach ($checkout->orderItems as $orderItem ) {
+            if ($orderItem->productItem->is_bundle) {
+                foreach ($orderItem->productItem->productOrigins as $productOrigin) {
+                    $productOrigin->decrement('stock', $orderItem->qty);
+                }
+            } 
+        }
+        foreach ($checkout->orderItems as $orderItem ) {
+            foreach ($orderItem->product->productItems as $productItem) {
+                if ($productItem->is_bundle) {
+                    $productItem->update([
+                        'stock' => $productItem->productOrigins()->min('stock')
+                    ]);
+                    if ($productItem->stock < 0) {
+                        $unavailableProducts['checkout.' . $orderItem->id] = ['Produk item kosong atau jumlah pesanan melebihi stok'];
+                    }
+                }
+            }
+            if (!$orderItem->productItem->is_bundle) {
+                $orderItem->productItem->decrement('stock', $orderItem->qty);
+                if ($productItem->stock < 0) {
+                    $unavailableProducts['checkout.' . $orderItem->id] = ['Produk item kosong atau jumlah pesanan melebihi stok'];
+                }
+            }
+        }
+        DB::rollBack();
+        if ($unavailableProducts)
             return [
                 'code' => 422,
                 'message' => 'Checkout item tidak valid',
-                'errors' => $checkoutItems
+                'errors' => $unavailableProducts
             ];
         else
             return false;
@@ -105,7 +146,6 @@ class CheckoutServiceImplement implements CheckoutService
             ];
         }
     }
-
     /**
      * hasNoCheckout
      *
@@ -166,6 +206,19 @@ class CheckoutServiceImplement implements CheckoutService
     }
     public function getAllShippingCost(): array
     {
+            // return [
+            //     'code' => 200,
+            //     'message' => 'Sukses mendapatkan harga ongkir',
+            //     'data' => [
+            //         [
+            //             'courier' => 'Jalur Nugraha Ekakurir (JNE)', 
+            //             'services' => ['OKE' => 10000,'REG' => 20000]
+            //         ], [
+            //             'courier' => 'POS Indonesia', 
+            //             'services' => ['POS Reguler' => 7000,'POS Kargo' => 3000]
+            //         ]
+            //     ]
+            // ];
         try {
             $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']]);
             $address = ShippingAddress::where('user_id', auth()->user()->id);
@@ -219,57 +272,112 @@ class CheckoutServiceImplement implements CheckoutService
         $courier = $attr['courier'];
         $service = $attr['service'];
         $bank = $attr['bank'];
+        $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']]);
+        $checkoutInformation = $checkout->first()->load([
+            'orderItems' => [
+                'productItem' => [
+                    'productOrigins',
+                    'product' => [
+                        'productBrand',
+                        'productImage'
+                    ]
+                ],
+                'product' => [
+                    'productItems'
+                ]
+            ],
+            'payment',
+            'shipping' => [
+                'shippingAddress'
+            ],
+            'productItems'
+        ]);
+        $cityId = $checkoutInformation->shipping->shippingAddress->city_id;
+        $totalWeight = $checkoutInformation->totalweight;
+        $cost = $this->shippingCostService->getCosts(222, $cityId, $totalWeight, $courier);
+        if (!isset($cost['services'][$service])) {
+            return [
+                'code' => 422,
+                'message' => 'Data yang diberikan tidak valid',
+                'bag' => 'shippingErrors',
+                'errors' => [
+                    'courier' => ['Kurir atau layanan tidak didukung']
+                ]
+            ];
+        }
         DB::beginTransaction();
         try {
-            $checkout = Order::where([['user_id', auth()->user()->id], ['status', 'checkout']]);
-            $address = ShippingAddress::where('user_id', auth()->user()->id);
-            $address = $address->clone()->find($checkout->first()->shipping()->first()->shipping_address_id);
-            $totalWeight = $checkout->first()->totalweight;
-            $cost = $this->shippingCostService->getCosts(222, $address->city_id, $totalWeight, $courier);
-            $orderItems = $checkout->first()->load('orderItems.productItem.productOrigins')->orderItems;
-            foreach ($orderItems as $orderItem ) {
-                if ($orderItem->productItem->is_bundle) {
-                    $productOriginIds = $orderItem->productItem->productOrigins->pluck('id');
-                    ProductOrigin::whereIn('id', $productOriginIds)->update([
-                        'stock' => \DB::raw('stock - ' . $orderItem->qty)
+            $shippingCost = $cost['services'][$service];
+            $grandTotal = $checkoutInformation->subtotal + $shippingCost - $this->calcDiscount();
+            $transaction = $this->paymentService->sendTransaction($checkoutInformation, $shippingCost, $grandTotal, $bank);
+            if ($transaction['status_code'] == 201) {
+                if ($transaction['fraud_status'] === 'accept') {
+                    $checkoutInformation->shipping->update([
+                        'courier' => $cost['courier'],
+                        'service' => $service,
+                        'shippingcost' => $shippingCost
                     ]);
-                } 
-            }
-            $orderItems = $checkout->first()->load('orderItems.productItem.productOrigins')->orderItems;
-            foreach ($orderItems as $orderItem ) {
-                if ($orderItem->productItem->is_bundle) {
-                    $orderItem->productItem->update([
-                        'stock' => $orderItem->productItem->productOrigins->min('stock')
+                    $checkoutInformation->update([
+                        'grandtotal' => $grandTotal
                     ]);
+                    $checkoutInformation->payment()->create([
+                        'order_code' => $transaction['order_id'],
+                        'bank' => $bank,
+                        'vanumber' => $transaction['va_numbers'][0]['va_number'],
+                        'amount' => $transaction['gross_amount'],
+                        'status' => $transaction['transaction_status'],
+                        'transactiontime' => $transaction['transaction_time']
+                    ]);
+                    foreach ($checkoutInformation->orderItems as $orderItem ) {
+                        if ($orderItem->productItem->is_bundle) {
+                            foreach ($orderItem->productItem->productOrigins as $productOrigin) {
+                                $productOrigin->decrement('stock', $orderItem->qty);
+                            }
+                        } 
+                    }
+                    foreach ($checkoutInformation->orderItems as $orderItem ) {
+                        foreach ($orderItem->product->productItems as $productItem) {
+                            if ($productItem->is_bundle) {
+                                $productItem->update([
+                                    'stock' => $productItem->productOrigins()->min('stock')
+                                ]);
+                            }
+                        }
+                        if (!$orderItem->productItem->is_bundle) {
+                            $orderItem->productItem->decrement('stock', $orderItem->qty);
+                        }
+                    }
+                    /* foreach ($checkoutInformation->orderItems as $orderItem ) {
+                        if ($orderItem->productItem->is_bundle) {
+                            $orderItem->productItem->update([
+                                'stock' => $orderItem->productItem->productOrigins->min('stock')
+                            ]);
+                        } else {
+                            $orderItem->productItem->decrement('stock', $orderItem->qty);
+                        }
+                    } */
+                    $productItems = $checkoutInformation->productItems
+                        ->map(fn($item) => ['id'=>$item->id, 'price'=>$item->price, 'discount'=>$item->discount])
+                        ->toArray();
+                    $checkoutInformation->update([
+                        'status' => $transaction['transaction_status'],
+                        'custom_properties' => $productItems
+                    ]);
+                    DB::commit();
+                    return [
+                        'code' => '201',
+                        'message' => 'Berhasil membuat pesanan, silahkan melakukan pembayaran',
+                        'data' => [
+                            'code' => $transaction['order_id']
+                        ]
+                    ];
                 } else {
-                    $orderItem->productItem->update([
-                        'stock' => \DB::raw('stock - ' . $orderItem->qty) 
-                    ]);
+                    return [
+                        'code' => 500,
+                        'message' => 'Pembayaran fraud, silahkan coba dengan bank lain'
+                    ];
                 }
-            }
-            if (@$cost['services'][$service]) {
-                $checkout->first()->shipping()->update([
-                    'courier' => $cost['courier'],
-                    'service' => $service,
-                    'shippingcost' => $cost['services'][$service]
-                ]);
             } else {
-                DB::rollBack();
-                return [
-                    'code' => 422,
-                    'message' => 'Data yang diberikan tidak valid',
-                    'bag' => 'shippingErrors',
-                    'errors' => [
-                        'courier' => ['Kurir atau layanan tidak didukung']
-                    ]
-                ];
-            }
-            $checkout->clone()->update([
-                'grandtotal' => $checkout->first()->subtotal + $cost['services'][$service] - $this->calcDiscount()
-            ]);
-            $transaction = $this->paymentService->sendTransaction($bank);
-            if ($transaction['status_code'] != 201) {
-                DB::rollBack();
                 return [
                     'code' => 422,
                     'message' => 'Data yang diberikan tidak valid',
@@ -278,33 +386,6 @@ class CheckoutServiceImplement implements CheckoutService
                         'bank' => ['Terjadi kesalahan transaksi']
                     ]
                 ];
-            }
-            if ($transaction['fraud_status'] === 'accept') {
-                $checkout->first()->payment()->create([
-                    'bank' => $bank,
-                    'vanumber' => $transaction['va_numbers'][0]['va_number'],
-                    'amount' => $transaction['gross_amount'],
-                    'status' => $transaction['transaction_status'],
-                    'transactiontime' => $transaction['transaction_time']
-                ]);
-                $codeOrder = $checkout->first()->code;
-                $productsPromo = $checkout->first()->productItems()->whereHas('product', fn($q) => $q->where('ispromo',1))->get(['product_items.id','price', 'discount'])->toJson();
-                /* tidak membuat kondisi where status = checkout berubah menjadi status = pending*/
-                $checkout->clone()->update([
-                    'status' => $transaction['transaction_status'],
-                    'custom_properties' => $productsPromo
-                ]);
-                DB::commit();
-                return [
-                    'code' => 204,
-                    'message' => 'Pesanan sukses dibuat, silahkan melakukan pembayaran'
-                ];
-            } else {
-                DB::rollBack();
-                return array(
-                    'code' => 500,
-                    'message' => 'Pembayaran fraud, silahkan coba dengan bank lain'
-                );
             }
         } catch (Exception $e) {
             DB::rollBack();

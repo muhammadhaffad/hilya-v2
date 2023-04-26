@@ -17,8 +17,8 @@ class Customer
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!Auth::check() || !Auth::user()->role == 'customer') {
-            return redirect()->route('sign_in');
+        if (!Auth::check() || Auth::user()->role !== 'customer') {
+            return redirect()->route('login');
         }
         return $next($request);
     }

@@ -38,7 +38,62 @@ class CartServiceImplement implements CartService
      */
     public function checkUnvailableProducts(): mixed
     {
-        $cart = Order::where([['user_id', auth()->user()->id], ['status', 'cart']]);
+        DB::beginTransaction();
+        $cart = Order::where([['user_id', auth()->user()->id], ['status', 'cart']])->first()->load([
+            'orderItems' => [
+                'productItem' => [
+                    'productOrigins',
+                    'product' => [
+                        'productBrand',
+                        'productImage'
+                    ]
+                ],
+                'product' => [
+                    'productItems'
+                ]
+            ],
+            'payment',
+            'shipping' => [
+                'shippingAddress'
+            ],
+            'productItems'
+        ]);
+        $unavailableProducts = [];
+        foreach ($cart->orderItems as $orderItem ) {
+            if ($orderItem->productItem->is_bundle) {
+                foreach ($orderItem->productItem->productOrigins as $productOrigin) {
+                    $productOrigin->decrement('stock', $orderItem->qty);
+                }
+            } 
+        }
+        foreach ($cart->orderItems as $orderItem ) {
+            foreach ($orderItem->product->productItems as $productItem) {
+                if ($productItem->is_bundle) {
+                    $productItem->update([
+                        'stock' => $productItem->productOrigins()->min('stock')
+                    ]);
+                    if ($productItem->stock < 0) {
+                        $unavailableProducts['cart.' . $productItem->id] = ['Produk item kosong atau jumlah pesanan melebihi stok'];
+                    }
+                }
+            }
+            if (!$orderItem->productItem->is_bundle) {
+                $orderItem->productItem->decrement('stock', $orderItem->qty);
+                if ($productItem->stock < 0) {
+                    $unavailableProducts['cart.' . $productItem->id] = ['Produk item kosong atau jumlah pesanan melebihi stok'];
+                }
+            }
+        }
+        DB::rollBack();
+        if ($unavailableProducts)
+            return [
+                'code' => 422,
+                'message' => 'Cart item tidak valid',
+                'errors' => $unavailableProducts
+            ];
+        else
+            return false;
+        /* $cart = Order::where([['user_id', auth()->user()->id], ['status', 'cart']]);
         $cartItems = $cart->join('order_items', 'order_id', 'orders.id')
             ->join('product_items', function ($join) {
                 $join->on('product_items.id', '=', 'order_items.product_item_id')
@@ -53,7 +108,7 @@ class CartServiceImplement implements CartService
                 'errors' => $cartItems
             ];
         else
-            return false;
+            return false; */
     }
     /**
      * calcSubTotal
@@ -202,14 +257,17 @@ class CartServiceImplement implements CartService
     {
         DB::beginTransaction();
         try {
-            $orderItem = Order::where([['user_id', auth()->user()->id], ['status', 'cart']])
-                ->first()->orderItems()->find($orderItemId);
+            $cart = Order::where([['user_id', auth()->user()->id], ['status', 'cart']]);
+            $orderItem = $cart->first()->orderItems()->find($orderItemId);
             if (!$orderItem)
                 return [
                     'code' => 404,
                     'message' => 'Tidak ada data'
                 ];
             $orderItem->delete();
+            if ($cart->first()->orderItems()->count() == 0) {
+                $cart->delete();
+            }
             DB::commit();
             return [
                 'code' => 204,
@@ -268,7 +326,6 @@ class CartServiceImplement implements CartService
             if (!$cart)
                 $cart = Order::create([
                     'user_id' => auth()->user()->id,
-                    'code' => str()->orderedUUid(),
                     'subtotal' => 0,
                     'totalweight' => 0,
                     'status' => 'cart'
@@ -294,6 +351,12 @@ class CartServiceImplement implements CartService
      */
     public function checkoutCart(): array
     {
+        if (ShippingAddress::where('user_id', auth()->user()->id)->count() == 0) {
+            return [
+                'code' => 302,
+                'message' => 'Silahkan tambahkan alamat terlebih dahulu'
+            ];
+        }
         DB::beginTransaction();
         try {
             $cart = Order::where([['user_id', auth()->user()->id], ['status', 'cart']]);
