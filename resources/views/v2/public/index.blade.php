@@ -42,7 +42,7 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
 
     <section id="ready-product" class="mt-16 sm:mt-36 space-y-8 px-4">
         <h1 class="block uppercase font-bold text-2xl">Produk Tersedia</h1>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-6">
             @foreach ($readyProducts as $key => $readyProduct)
             <div class="flex flex-col gap-2 h-full">
                 <div class="relative">
@@ -66,7 +66,7 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
                                 <span class="font-semibold text-xs text-red-500">{{$readyProduct->productItems->first()->discount}}% <s class="font-normal text-color-5">{{\Helper::rupiah($readyProduct->product_items_min_price)}} - {{\Helper::rupiah($readyProduct->product_items_max_price)}}</s></span>
                             @endif
                         </div>
-                        <div class="flex justify-between">
+                        <div class="flex justify-between text-xs">
                             <span>{{$readyProduct->category ?? 'Busana'}}</span>
                             <button data-popover-target="stock-{{$key}}" data-popover-trigger="click">Lihat stok...</button>
                             <div data-popover id="stock-{{$key}}" role="tooltip" class="absolute z-[1] invisible inline-block w-64 text-sm transition-opacity duration-300 bg-white border !border-color-4 rounded shadow-sm opacity-0">
@@ -82,7 +82,7 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
                             </div>
                         </div>
                     </div>
-                    <button class="px-5 w-full h-[42px] bg-color-4 text-white font-semibold uppercase border rounded" onclick="window.location.href='{{$readyProduct->link}}'">Lihat Produk</button>
+                    <button class="px-5 w-full h-[42px] text-xs sm:text-base bg-color-4 text-white font-semibold uppercase border rounded" onclick="window.location.href='{{$readyProduct->link}}'">Lihat Produk</button>
                 </div>
             </div>
             @endforeach
@@ -169,7 +169,7 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
                     </div>
                 </div>
                 @empty
-                <div class="flex flex-col items-center justify-center w-full h-52 text-color-2 uppercase font-semibold text-xl border border-color-3 rounded">
+                <div class="flex flex-col items-center text-center justify-center w-full h-52 text-color-2 uppercase font-semibold text-xl border border-color-3 rounded">
                     <h1 class="font-bold text-3xl">404</h1>
                     <span>PRODUK PROMO KOSONG</span>
                 </div>
@@ -230,7 +230,7 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
                     </div>
                 </div>
                 @empty
-                <div class="flex flex-col items-center justify-center w-full h-52 text-color-2 uppercase font-semibold text-xl border border-color-3 rounded">
+                <div class="flex flex-col items-center text-center justify-center w-full h-52 text-color-2 uppercase font-semibold text-xl border border-color-3 rounded">
                     <h1 class="font-bold text-3xl">404</h1>
                     <span>PRODUK PRE-ORDER KOSONG</span>
                 </div>

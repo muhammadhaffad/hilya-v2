@@ -12,7 +12,7 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
 @endpush
     <section class="space-y-8 px-4">
         <h1 class="block uppercase font-bold text-2xl">Produk {{$brand->name}}</h1>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-6">
             @forelse ($brandProducts as $key => $brandProduct)
             <div class="flex flex-col gap-2 h-full">
                 <div class="relative">
@@ -36,7 +36,7 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
                                 <span class="font-semibold text-xs text-red-500">{{$brandProduct->productItems->first()->discount}}% <s class="font-normal text-color-5">{{\Helper::rupiah($brandProduct->product_items_min_price)}} - {{\Helper::rupiah($brandProduct->product_items_max_price)}}</s></span>
                             @endif
                         </div>
-                        <div class="flex justify-between">
+                        <div class="flex justify-between text-xs">
                             <span>{{$brandProduct->category ?? 'Busana'}}</span>
                             <button data-popover-target="stock-{{$key}}" data-popover-trigger="click">Lihat stok...</button>
                             <div data-popover id="stock-{{$key}}" role="tooltip" class="absolute z-[1] invisible inline-block w-64 text-sm transition-opacity duration-300 bg-white border !border-color-4 rounded shadow-sm opacity-0">
@@ -52,7 +52,7 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
                             </div>
                         </div>
                     </div>
-                    <button class="px-5 w-full h-[42px] bg-color-4 text-white font-semibold uppercase border rounded" onclick="window.location.href='{{$brandProduct->link}}'">Lihat Produk</button>
+                    <button class="px-5 w-full h-[42px] text-xs sm:text-base bg-color-4 text-white font-semibold uppercase border rounded" onclick="window.location.href='{{$brandProduct->link}}'">Lihat Produk</button>
                 </div>
             </div>
             @empty

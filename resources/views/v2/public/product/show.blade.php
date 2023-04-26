@@ -100,6 +100,16 @@
     @endif
     @push('script')
         <script>
+            $(document).ready(function () {
+                if (localStorage.getItem("my_app_name_here-quote-scroll") != null) {
+                    $(window).scrollTop(localStorage.getItem("my_app_name_here-quote-scroll"));
+                }
+                $(window).on("scroll", function() {
+                    localStorage.setItem("my_app_name_here-quote-scroll", $(window).scrollTop());
+                });
+            });
+        </script>
+        <script>
             const urlParam = new URLSearchParams(window.location.search);
             const productDetail = JSON.parse($('#product_detail').text());
             const productItems = productDetail.product_items;
