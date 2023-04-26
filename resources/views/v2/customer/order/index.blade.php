@@ -16,7 +16,7 @@
         <ul class="flex flex-wrap gap-1">
             <li>
                 <a class="font-semibold" href="{{ request()->fullUrlWithQuery(['status' => '']) }}">
-                    Semua ({{ auth()->user()->orders()->count() }})
+                    Semua ({{ auth()->user()->orders()->withoutStatus(['cart', 'checkout'])->count() }})
                 </a>
             </li>
             <li>|</li>

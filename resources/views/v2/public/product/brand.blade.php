@@ -1,4 +1,4 @@
-@extends('v2.layouts.public.app', ['title'=>'Hillia Collection'])
+@extends('v2.layouts.public.app', ['title'=>$brand->name.' | Hillia Collection'])
 @section('content')
 @push('style')
 <link
@@ -11,40 +11,40 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
 <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
 @endpush
     <section class="space-y-8 px-4">
-        <h1 class="block uppercase font-bold text-2xl">Produk Pre-Order</h1>
+        <h1 class="block uppercase font-bold text-2xl">Produk {{$brand->name}}</h1>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            @forelse ($preorderProducts as $key => $preorderProduct)
+            @forelse ($brandProducts as $key => $brandProduct)
             <div class="flex flex-col gap-2 h-full">
                 <div class="relative">
                     <div class="absolute top-0 left-0 p-2">
-                        @if ($preorderProduct->availability == 'pre-order')
+                        @if ($brandProduct->availability == 'pre-order')
                             <span class="bg-color-3 text-white p-1 px-2 rounded text-xs font-semibold">PRE-ORDER</span>
                         @endif
-                        @if ($preorderProduct->ispromo)
+                        @if ($brandProduct->ispromo)
                             <span class="bg-red-500 text-white p-1 px-2 rounded text-xs font-semibold">PROMO</span>    
                         @endif
                     </div>
-                    <img src="{{asset('storage/'.$preorderProduct->productImages->first()->image)}}" alt="" class="w-full rounded">
+                    <img src="{{asset('storage/'.$brandProduct->productImages->first()->image)}}" alt="" class="w-full rounded">
                 </div>
                 <div class="flex flex-col gap-4 h-full">
                     <div class="flex flex-col gap-1 grow">
-                        <p class="font-semibold">{{$preorderProduct->productBrand->name}}</p>
-                        <p>{{$preorderProduct->name}}</p>
+                        <p class="font-semibold">{{$brandProduct->productBrand->name}}</p>
+                        <p>{{$brandProduct->name}}</p>
                         <div class="flex flex-col">
-                            <span class="font-semibold">{{\Helper::rupiah($preorderProduct->product_items_min_price - (int)($preorderProduct->product_items_min_price*$preorderProduct->productItems->first()->discount/100))}} - {{\Helper::rupiah($preorderProduct->product_items_max_price - (int)($preorderProduct->product_items_max_price*$preorderProduct->productItems->first()->discount/100))}}</span>
-                            @if ($preorderProduct->ispromo)
-                                <span class="font-semibold text-xs text-red-500">{{$preorderProduct->productItems->first()->discount}}% <s class="font-normal text-color-5">{{\Helper::rupiah($preorderProduct->product_items_min_price)}} - {{\Helper::rupiah($preorderProduct->product_items_max_price)}}</s></span>
+                            <span class="font-semibold">{{\Helper::rupiah($brandProduct->product_items_min_price - (int)($brandProduct->product_items_min_price*$brandProduct->productItems->first()->discount/100))}} - {{\Helper::rupiah($brandProduct->product_items_max_price - (int)($brandProduct->product_items_max_price*$brandProduct->productItems->first()->discount/100))}}</span>
+                            @if ($brandProduct->ispromo)
+                                <span class="font-semibold text-xs text-red-500">{{$brandProduct->productItems->first()->discount}}% <s class="font-normal text-color-5">{{\Helper::rupiah($brandProduct->product_items_min_price)}} - {{\Helper::rupiah($brandProduct->product_items_max_price)}}</s></span>
                             @endif
                         </div>
                         <div class="flex justify-between">
-                            <span>{{$preorderProduct->category ?? 'Busana'}}</span>
+                            <span>{{$brandProduct->category ?? 'Busana'}}</span>
                             <button data-popover-target="stock-{{$key}}" data-popover-trigger="click">Lihat stok...</button>
                             <div data-popover id="stock-{{$key}}" role="tooltip" class="absolute z-[1] invisible inline-block w-64 text-sm transition-opacity duration-300 bg-white border !border-color-4 rounded shadow-sm opacity-0">
                                 <div class="px-3 py-2 border-b bg-color-5">
                                     <h3 class="font-semibold text-white">Stok</h3>
                                 </div>
                                 <div class="px-3 py-2 flex flex-wrap gap-2 text-color-5">
-                                    @foreach ($preorderProduct->productItems as $productItem)
+                                    @foreach ($brandProduct->productItems as $productItem)
                                         <p class="p-1 px-2 border rounded border-color-4"><span class="font-bold">{{$productItem->size}}</span> {{$productItem->stock}}</p>
                                     @endforeach
                                 </div>
@@ -52,7 +52,7 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
                             </div>
                         </div>
                     </div>
-                    <button class="px-5 w-full h-[42px] bg-color-4 text-white font-semibold uppercase border rounded" onclick="window.location.href='{{$preorderProduct->link}}'">Lihat Produk</button>
+                    <button class="px-5 w-full h-[42px] bg-color-4 text-white font-semibold uppercase border rounded" onclick="window.location.href='{{$brandProduct->link}}'">Lihat Produk</button>
                 </div>
             </div>
             @empty
@@ -62,7 +62,9 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
             </div>
             @endforelse
         </div>
-        {!! $preorderProducts->links() !!}
+        @empty(!$brandProducts)
+        {!! $brandProducts->links() !!}
+        @endempty
     </section>
 
     <section class="my-16 sm:my-36 px-4">

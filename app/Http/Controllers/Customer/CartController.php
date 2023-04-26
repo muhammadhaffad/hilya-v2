@@ -16,7 +16,6 @@ class CartController extends Controller
     public function __construct(CartService $cartService)
     {
         $this->cartService = $cartService;
-        auth()->loginUsingId(1);
     }
     public function test()
     {
@@ -104,6 +103,9 @@ class CartController extends Controller
         $result = $this->cartService->checkoutCart();
         if ($result['code'] == 204) {
             return redirect()->route('customer.checkout')->with('message', $result['message']);
+        }
+        if ($result['code'] == 302) {
+            return redirect()->route('customer.address-book')->with('message', $result['message']);
         }
         return abort(500);
     }

@@ -89,6 +89,7 @@ class AddressServiceImplement implements AddressService
                     ]
                 ];
             }
+            $type = (ShippingAddress::where('user_id', auth()->user()->id)->count() == 0) ? 'primary' : 'secondary';
             $address = ShippingAddress::create([
                 'user_id' => auth()->user()->id,
                 'addressname' => $attr['addressname'],
@@ -100,7 +101,7 @@ class AddressServiceImplement implements AddressService
                 'zip' => $attr['zip'],
                 'fulladdress' => $attr['fulladdress'],
                 'isselect' => false,
-                'type' => 'secondary'
+                'type' => $type
             ]);
             DB::commit();
             return [

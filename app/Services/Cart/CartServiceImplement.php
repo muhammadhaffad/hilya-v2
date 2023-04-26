@@ -351,6 +351,12 @@ class CartServiceImplement implements CartService
      */
     public function checkoutCart(): array
     {
+        if (ShippingAddress::where('user_id', auth()->user()->id)->count() == 0) {
+            return [
+                'code' => 302,
+                'message' => 'Silahkan tambahkan alamat terlebih dahulu'
+            ];
+        }
         DB::beginTransaction();
         try {
             $cart = Order::where([['user_id', auth()->user()->id], ['status', 'cart']]);

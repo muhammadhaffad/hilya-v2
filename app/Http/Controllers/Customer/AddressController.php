@@ -34,7 +34,7 @@ class AddressController extends Controller
         if ($result['code'] == 200) {
             return view('v2.customer.address-book.index', ['addresses' => $result['data']]);
         }
-        abort(404);
+        return view('v2.customer.address-book.index', ['addresses' => []]);
     }
 
     public function edit($addressId)

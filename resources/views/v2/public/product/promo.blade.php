@@ -10,7 +10,7 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
 @endpush
-    <section class="space-y-8">
+    <section class="space-y-8 px-4">
         <h1 class="block uppercase font-bold text-2xl">Produk Promo</h1>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             @forelse ($promoProducts as $key => $promoProduct)
@@ -65,12 +65,12 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
         {!! $promoProducts->links() !!}
     </section>
 
-    <section class="my-36">
+    <section class="my-16 sm:my-36 px-4">
         <div class="flex gap-4 flex-nowrap max-w-[1228px]">
             <div class="overflow-x-scroll w-full flex gap-4">
                 @foreach($productBrands as $brand)
                 <div>
-                    <div class="w-28 sm:w-36 text-center space-y-2">
+                    <div class="w-28 sm:w-36 text-center space-y-2 cursor-pointer" onclick="window.location.href='{{route('product.brand', ['brand' => $brand->slug])}}'">
                         <div class="w-full h-28 sm:h-36 border rounded flex items-center">
                             <img src="{{asset('storage/'.$brand->image)}}" class="w-full">
                         </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductBrand;
 use App\Services\Cart\CartService;
 use App\Services\Product\ProductService;
 use App\Services\ProductBrand\ProductBrandService;
@@ -105,5 +106,22 @@ class ProductController extends Controller
             $promoProducts = [];
         }
         return view('v2.public.product.promo', compact('promoProducts', 'productBrands'));
+    }
+
+    public function brand(Request $request, ProductBrand $brand)
+    {
+        $result = $this->productBrandService->getAllBrand();
+        if ($result['code'] == 200) {
+            $productBrands = $result['data'];
+        } else {
+            $productBrands = [];
+        }
+        $result = $this->productService->getProductsByBrand([$brand->id], paginate:12);
+        if ($result['code'] == 200) {
+            $brandProducts = $result['data'];
+        } else {
+            $brandProducts = [];
+        }
+        return view('v2.public.product.brand', compact('brand', 'brandProducts', 'productBrands'));
     }
 }

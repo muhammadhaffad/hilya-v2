@@ -10,24 +10,25 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
 @endpush
-    <section id="hero" class="grid grid-cols-2 items-center">
-        <div>
-            <p>Selamat Datang di <span class="font-semibold">Hillia Collection</span></p>
-            <h1 class="text-6xl font-bold ">Temukan Busana Muslim Pilihanmu</h1>
-            <p>Reseller busana muslim terlengkap</p>
-            <button class="mt-8 px-5 w-full sm:w-fit h-[42px] bg-color-4 text-white font-semibold uppercase border rounded" onclick="window.location.href='{{route('home').'#ready-product'}}'">Mulai Belanja</button>
+    <section id="hero" class="grid grid-cols-1 gap-4 items-center px-4">
+        <div class="relative">
+            <div class="flex flex-col gap-4 py-8 justify-center w-full sm:w-1/2">
+                <p>Selamat Datang di <span class="font-semibold">Hillia Collection</span></p>
+                <h1 class="text-4xl sm:text-6xl font-bold">Temukan Busana Muslim Pilihanmu</h1>
+                <p>Reseller busana muslim terlengkap</p>
+                <button class="hidden sm:block px-5 w-full sm:w-fit h-[42px] bg-color-4 text-white font-semibold uppercase rounded" onclick="window.location.href='{{route('home').'#ready-product'}}'">Mulai Belanja</button>
+            </div>
+            <img src="{{asset('assets/images/hero image.png')}}" class="absolute h-full bg-contain ml-auto bottom-0 -z-10 right-0">
         </div>
-        <div>
-            <img src="{{asset('assets/images/hero image.png')}}" class="w-[603px]">
-        </div>
+        <button class="sm:hidden px-5 w-full sm:w-fit h-[42px] bg-color-4 text-white font-semibold uppercase rounded" onclick="window.location.href='{{route('home').'#ready-product'}}'">Mulai Belanja</button>
     </section>
 
-    <section class="mt-8">
+    <section class="mt-4 sm:mt-8 px-4">
         <div class="flex gap-4 flex-nowrap max-w-[1228px]">
             <div class="overflow-x-scroll w-full flex gap-4">
                 @foreach($productBrands as $brand)
                 <div>
-                    <div class="w-28 sm:w-36 text-center space-y-2">
+                    <div class="w-28 sm:w-36 text-center space-y-2 cursor-pointer" onclick="window.location.href='{{route('product.brand', ['brand' => $brand->slug])}}'">
                         <div class="w-full h-28 sm:h-36 border rounded flex items-center">
                             <img src="{{asset('storage/'.$brand->image)}}" class="w-full">
                         </div>
@@ -39,7 +40,7 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
         </div>
     </section>
 
-    <section id="ready-product" class="mt-36 space-y-8">
+    <section id="ready-product" class="mt-16 sm:mt-36 space-y-8 px-4">
         <h1 class="block uppercase font-bold text-2xl">Produk Tersedia</h1>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             @foreach ($readyProducts as $key => $readyProduct)
@@ -102,13 +103,13 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
         @endif
     </section>
 
-    <section class="mt-36 space-y-8">
+    <section class="mt-16 sm:mt-36 space-y-8 px-4">
         <div class="flex justify-between items-center">
             <h1 class="block uppercase font-bold text-2xl">Produk Promo</h1>
-            <button class="block uppercase font-semibold underline" onclick="window.location.href='{{route('product.promo')}}'">Lihat Semua...</button>
+            <button class="block uppercase font-semibold underline text-right" onclick="window.location.href='{{route('product.promo')}}'">Lihat Semua...</button>
         </div>
         <div class="flex gap-4 flex-nowrap w-full">
-            <div class="overflow-x-scroll w-full flex gap-8 overflow-y-hidden">
+            <div class="overflow-x-scroll w-full flex gap-4 sm:gap-8 overflow-y-hidden">
                 @forelse ($promoProducts as $key => $promoProduct)
                 <div>
                     <div class="flex flex-col w-[290px] gap-2 h-full">
@@ -177,7 +178,7 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
         </div>
     </section>
 
-    <section class="mt-36 mb-36 space-y-8">
+    <section class="my-16 sm:my-36 space-y-8 px-4">
         <div class="flex justify-between items-center">
             <h1 class="block uppercase font-bold text-2xl">Produk Pre-Order</h1>
             <button class="block uppercase font-semibold underline" onclick="window.location.href='{{route('product.preorder')}}'">Lihat Semua...</button>

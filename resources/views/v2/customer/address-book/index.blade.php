@@ -1,9 +1,11 @@
 @extends('v2.layouts.customer.app', ['title' => 'Buku Alamat | Hillia Collection'])
 @section('content')
 @php
-    $provinces = Helper::getProvinces();
-    $cities = Helper::getCities();
-    $subdistricts = Helper::getSubdistricts($addresses->pluck('city_id')->unique()->all());
+    if ($addresses !== []) {
+        $provinces = Helper::getProvinces();
+        $cities = Helper::getCities();
+        $subdistricts = Helper::getSubdistricts($addresses->pluck('city_id')->unique()->all());
+    }
 @endphp
 <div class="flex font-bold text-xl gap-1 items-center uppercase">
     <span class="material-icons !text-4xl">
@@ -18,7 +20,7 @@
     <a href="{{ route('customer.address-book.create') }}" class="ml-auto py-2 px-4 uppercase font-medium bg-color-4 text-white rounded">+ Tambah Alamat</a>
 </div>
 <ul class="space-y-4">
-    @foreach ($addresses as $index => $address)
+    @forelse ($addresses as $index => $address)
     <li>
         <div for="alamat-{{ $index }}"
             class="{{$address->isselect ? 'bg-color-1' : ''}} block rounded-lg border border-color-4">
@@ -109,6 +111,10 @@
             </div>
         </div>
     </li>
-    @endforeach
+    @empty
+    <div class="w-full h-72 flex items-center justify-center text-xl border rounded">
+        Selesaikan pendaftaran dengan menambahkan alamat Anda
+    </div>
+    @endforelse
 </ul>
 @endsection

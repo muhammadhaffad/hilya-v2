@@ -14,7 +14,7 @@
             @endforeach
         </span>
     @endif
-    <section class="grid grid-cols-2 gap-5">
+    <section class="grid grid-cols-1 mb-16 sm:grid-cols-2 sm:mt-8 sm:mb-36 gap-5 px-4">
         <div class="w-full space-y-4">
             <div class="w-full">
                 <img id="main-image" src="{{asset('storage/'.$product->productImages->first()->image)}}" alt="" class="w-full">
@@ -57,10 +57,6 @@
                 @endif
             </div>
             <span class="block">{{$product->category ?? 'Busana'}}</span>
-            <div>
-                <label class="font-semibold">Deskripsi</label>
-                <p>{{$product->description}}</p>
-            </div>
             <form action="" method="get" class="space-y-2">
                 <div>
                     <label class="font-semibold" for="">Pilih untuk:</label>
@@ -86,6 +82,10 @@
                 <div id="qty">
                 </div>
             </form>
+            <div>
+                <label class="font-semibold">Deskripsi</label>
+                <p>{{$product->description}}</p>
+            </div>
         </div>
     </section>
     <div class="hidden" id="product_detail">

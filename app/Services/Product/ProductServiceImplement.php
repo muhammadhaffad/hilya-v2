@@ -238,7 +238,7 @@ class ProductServiceImplement implements ProductService
         }
         if ($paginate !== null) {
             $productsPagination = $products->cursorPaginate($paginate)->withQueryString();
-            if (!$productsPagination) {
+            if ($productsPagination) {
                 return [
                     'code' => 200,
                     'message' => 'Sukses mendapatkan data products',

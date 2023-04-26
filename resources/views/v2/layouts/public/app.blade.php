@@ -23,7 +23,7 @@
                 </div>
                 <div id="nav-menu" class="absolute bg-white lg:static top-full left-0 right-0 flex flex-col lg:flex-row items-start lg:items-center px-10 py-5 lg:p-0 gap-3 border lg:border-0 scale-x-0 lg:scale-100 shadow-lg lg:shadow-none">
                     <div class="w-max">
-                        <img class="cursor-pointer" src="{{ asset('assets/images/logo.png') }}" onclick="window.location.href='{{route('home')}}'" alt="">
+                        <img class="cursor-pointer w-20" src="{{ asset('assets/images/logo.png') }}" onclick="window.location.href='{{route('home')}}'" alt="">
                     </div>
                     <a href="{{route('home')}}" class="uppercase cursor-pointer whitespace-nowrap overflow-hidden text-ellipsis">Home</a>
                     <a href="{{route('product.promo')}}" class="uppercase cursor-pointer whitespace-nowrap overflow-hidden text-ellipsis">Promo</a>
@@ -35,32 +35,65 @@
                         <span class="material-icons !text-3xl">search</span>
                         <button class="hidden sm:block w-40 text-left text-color-2">Cari produk disini...</button>
                     </div>
-                    <button onclick="window.location.href='{{route('customer.cart')}}'" class="relative block"><span class="material-icons !text-4xl">shopping_bag</span><span class="absolute bottom-0 -right-1 min-w-[24px] bg-red-500 p-1 rounded-full text-xs text-white">{{App\Models\Order::where('status', 'cart')->first()?->orderItems()->count() ?? 0}}</span></button>
+                    @auth
+                        @if (auth()->user()->role == 'customer')
+                        <button onclick="window.location.href='{{route('customer.cart')}}'" class="relative block"><span class="material-icons !text-4xl">shopping_bag</span><span class="absolute bottom-0 -right-1 min-w-[24px] bg-red-500 p-1 rounded-full text-xs text-white">{{App\Models\Order::where('status', 'cart')->first()?->orderItems()->count() ?? 0}}</span></button>
+                        @endif
                     <button onclick="$('#menu,#menu-background').toggleClass('hidden')" class="block"><span class="material-icons !text-4xl">account_circle</span></button>
-                </div>
-                <div id="menu-background" class="hidden absolute top-0 bottom-0 left-0 right-0 opacity-100 h-screen w-screen" onclick="$('#menu,#menu-background').toggleClass('hidden')"></div>
-                <div id="menu" class="hidden absolute w-full sm:max-w-xs z-10 top-full right-0 mt-0 sm:mt-4 mr-0 sm:mr-10 p-3 rounded border bg-white shadow-lg">
-                    <ul class="space-y-1">
-                        <li onclick="window.location.href='{{route('customer.dashboard')}}'" class="whitespace-nowrap overflow-hidden text-ellipsis font-semibold cursor-pointer">Selamat datang, {{auth()->user()->username}}</li>
-                        <li>
-                            <button class="flex w-full justify-between items-center cursor-pointer" onclick="window.location.href='{{route('customer.cart')}}?status=paid'">
-                                <span>Keranjang</span>
-                                <span class="min-w-[24px] bg-red-500 p-1 rounded-full text-xs text-white">{{App\Models\Order::where('status', 'cart')->first()?->orderItems()->count() ?? 0}}</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button class="flex w-full justify-between items-center cursor-pointer" onclick="window.location.href='{{route('customer.orders')}}'">
-                                <span>Pesanan</span>
-                            </button>
-                        </li>
-                        <hr>
-                        <li>
-                            <form action="{{route('logout')}}" method="post" onsubmit="return confirm('Apakah Anda yakin ingin keluar?')">
-                            @csrf
-                            <button class="text-red-500">Logout</button>
-                            </form>
-                        </li>
-                    </ul>
+                        @if (auth()->user()->role == 'admin')
+                        <div id="menu-background" class="hidden absolute top-0 bottom-0 left-0 right-0 opacity-100 h-screen w-screen" onclick="$('#menu,#menu-background').toggleClass('hidden')"></div>
+                        <div id="menu" class="hidden absolute w-full sm:max-w-xs z-10 top-full right-0 mt-0 sm:mt-4 mr-0 sm:mr-10 p-3 rounded border bg-white shadow-lg">
+                            <ul class="space-y-1">
+                                <li onclick="window.location.href='{{route('admin.dashboard')}}'" class="whitespace-nowrap overflow-hidden text-ellipsis font-semibold cursor-pointer">Selamat datang, {{auth()->user()->username}}</li>
+                                <li>
+                                    <button class="flex w-full justify-between items-center cursor-pointer" onclick="window.location.href='{{route('admin.order')}}?status=paid'">
+                                        <span>Pesanan Masuk</span>
+                                        <span class="font-semibold bg-red-500 text-white p-1 rounded text-xs">{{App\Models\Order::where('status', 'paid')->count()}}</span>
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="flex w-full justify-between items-center cursor-pointer" onclick="window.location.href='{{route('admin.product.create')}}'">
+                                        <span>Tambah Produk</span>
+                                    </button>
+                                </li>
+                                <hr>
+                                <li>
+                                    <form action="{{route('logout')}}" method="post" onsubmit="return confirm('Apakah Anda yakin ingin keluar?')">
+                                    @csrf
+                                    <button class="text-red-500">Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                        @else
+                        <div id="menu-background" class="hidden absolute top-0 bottom-0 left-0 right-0 opacity-100 h-screen w-screen" onclick="$('#menu,#menu-background').toggleClass('hidden')"></div>
+                        <div id="menu" class="hidden absolute w-full sm:max-w-xs z-10 top-full right-0 mt-0 sm:mt-4 mr-0 sm:mr-10 p-3 rounded border bg-white shadow-lg">
+                            <ul class="space-y-1">
+                                <li onclick="window.location.href='{{route('customer.dashboard')}}'" class="whitespace-nowrap overflow-hidden text-ellipsis font-semibold cursor-pointer">Selamat datang, {{auth()->user()->username}}</li>
+                                <li>
+                                    <button class="flex w-full justify-between items-center cursor-pointer" onclick="window.location.href='{{route('customer.cart')}}?status=paid'">
+                                        <span>Keranjang</span>
+                                        <span class="min-w-[24px] bg-red-500 p-1 rounded-full text-xs text-white">{{App\Models\Order::where('status', 'cart')->first()?->orderItems()->count() ?? 0}}</span>
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="flex w-full justify-between items-center cursor-pointer" onclick="window.location.href='{{route('customer.orders')}}'">
+                                        <span>Pesanan</span>
+                                    </button>
+                                </li>
+                                <hr>
+                                <li>
+                                    <form action="{{route('logout')}}" method="post" onsubmit="return confirm('Apakah Anda yakin ingin keluar?')">
+                                    @csrf
+                                    <button class="text-red-500">Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                        @endif
+                    @else
+                    <button class="uppercase p-2 px-4 rounded border border-color-1 text-sm" onclick="window.location.href='{{route('login')}}'">Masuk</button>                    
+                    @endauth
                 </div>
             </div>
         </div>
@@ -82,7 +115,7 @@
         @yield('content')
     </main>
     <footer id="footer" class="px-10 text-white bg-color-4 py-10">
-        <div class="grid grid-cols-3 gap-x-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="space-y-3">
                 <h2 class="font-bold text-2xl">Hubungi Kami</h2>
                 <ul class="space-y-1">

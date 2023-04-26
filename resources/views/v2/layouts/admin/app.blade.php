@@ -21,8 +21,8 @@
                 <div class="flex sm:hidden">
                     <button class="material-icons !text-4xl" onclick="$('#side-menu').toggleClass('hidden')">menu</button>
                 </div>
-                <div class="hidden sm:flex items-center gap-3 cursor-pointer" onclick="window.location.href='{{route('admin.dashboard')}}'">
-                    <img src="{{ asset('assets/images/logo.png') }}" alt="">
+                <div class="hidden sm:flex items-center gap-3 cursor-pointer" onclick="window.location.href='{{route('home')}}'">
+                    <img class="w-20" src="{{ asset('assets/images/logo.png') }}" alt="">
                     <h1 class="text-xl"><span class="font-bold">Hillia</span> <span
                             class="text-color-2">Collection</span></h1>
                 </div>
