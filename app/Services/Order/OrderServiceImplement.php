@@ -12,9 +12,9 @@ class OrderServiceImplement implements OrderService
     {
         $order = Payment::where('order_code', $code)->first()->order()->first()->load('orderItems.productItem');
         $total = 0;
-        $customProps = collect($order->custom_properties);
+        $customProps = $order->custom_properties;
         foreach ($order->orderItems as $orderItem) {
-            $prop = $customProps->where('id', $orderItem->productItem->id)->first();
+            $prop = collect($customProps['product_items'])->where('id', $orderItem->productItem->id)->first();
             if ($prop) {
                 $total += $orderItem->qty * (int)($prop['price']*$prop['discount']/100);
             }

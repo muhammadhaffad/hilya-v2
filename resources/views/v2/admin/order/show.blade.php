@@ -1,9 +1,10 @@
 @extends('v2.layouts.admin.app', ['title' => 'Detail Pesanan | Hillia Collection'])
 @section('content')
 @php
+    $custom_properties = $order->custom_properties;
     $provinces = Helper::getProvinces();
     $cities = Helper::getCities();
-    $subdistricts = Helper::getSubdistricts($order->shipping->shippingAddress->pluck('city_id')->unique()->all());
+    $subdistricts = Helper::getSubdistricts([$custom_properties['shipping_address']['city_id']]);
 @endphp
     <div class="flex font-bold text-xl gap-1 items-center uppercase">
         <span class="material-icons !text-4xl">
@@ -60,7 +61,7 @@
     </section>
     <section class="p-4 rounded-lg border border-color-4 space-y-4">
         <span class="w-min p-1 px-2 bg-color-4 text-white rounded">
-            {{ $order->shipping->shippingAddress->addressname }}
+            {{ $custom_properties['shipping_address']['addressname'] }}
         </span>
         <ul class="space-y-2">
             <li>
@@ -68,8 +69,8 @@
                     Nama penerima & No. Tlp
                 </span>
                 <span>
-                    {{ $order->shipping->shippingAddress->shippingname }}
-                    ({{ $order->shipping->shippingAddress->phonenumber }})
+                    {{ $custom_properties['shipping_address']['shippingname'] }}
+                    ({{ $custom_properties['shipping_address']['phonenumber'] }})
                 </span>
             </li>
             <li>
@@ -79,7 +80,7 @@
                             Provinsi
                         </span>
                         <span>
-                            {{ Helper::getProvince($provinces, $order->shipping->shippingAddress->province_id) }}
+                            {{ Helper::getProvince($provinces, $custom_properties['shipping_address']['province_id']) }}
                         </span>
                     </li>
                     <li>
@@ -87,7 +88,7 @@
                             Kabupaten/Kota
                         </span>
                         <span>
-                            {{ Helper::getCity($cities, $order->shipping->shippingAddress->city_id) }}
+                            {{ Helper::getCity($cities, $custom_properties['shipping_address']['city_id']) }}
                         </span>
                     </li>
                     <li>
@@ -95,7 +96,7 @@
                             Kecamatan
                         </span>
                         <span>
-                            {{ Helper::getSubdistrict($subdistricts, $order->shipping->shippingAddress->subdistrict_id) }}
+                            {{ Helper::getSubdistrict($subdistricts, $custom_properties['shipping_address']['subdistrict_id']) }}
                         </span>
                     </li>
                     <li>
@@ -103,7 +104,7 @@
                             Kode Pos
                         </span>
                         <span>
-                            {{ $order->shipping->shippingAddress->zip }}
+                            {{ $custom_properties['shipping_address']['zip'] }}
                         </span>
                     </li>
                 </ul>
@@ -113,7 +114,7 @@
                     Alamat lengkap
                 </span>
                 <span>
-                    {{ $order->shipping->shippingAddress->fulladdress }}
+                    {{ $custom_properties['shipping_address']['fulladdress'] }}
                 </span>
             </li>
         </ul>
@@ -139,11 +140,10 @@
         </ul>
     </section>
     <section class="space-y-4">
-        @php $custom_properties = collect($order->custom_properties) @endphp
         @foreach ($order->orderItems as $orderItem)
             <div class="flex flex-wrap items-start justify-between gap-4 p-2 border border-color-4 rounded-lg">
                 <div class="flex flex-wrap items-start gap-2">
-                    <img src="{{ asset('assets/images/sample.png') }}" alt=""
+                    <img src="{{ asset('storage/'.$orderItem->productItem->product->productImage->image) }}" alt=""
                         class="w-24">
                     <ul class="max-w-[300px]">
                         <li class="font-bold"><span
@@ -162,7 +162,7 @@
                     </ul>
                 </div>
                 <div class="w-max">
-                    @php $property = $custom_properties->where('id', $orderItem->productItem->id)->first() @endphp
+                    @php $property = collect($custom_properties['product_items'])->where('id', $orderItem->productItem->id)->first() @endphp
                     <ul>
                         <li class="font-bold text-xl">
                             {{ $orderItem->qty }} ×

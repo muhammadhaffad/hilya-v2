@@ -264,6 +264,7 @@ class CartServiceImplement implements CartService
                     'code' => 404,
                     'message' => 'Tidak ada data'
                 ];
+            $cart->first()->shipping()->delete();
             $orderItem->delete();
             if ($cart->first()->orderItems()->count() == 0) {
                 $cart->delete();

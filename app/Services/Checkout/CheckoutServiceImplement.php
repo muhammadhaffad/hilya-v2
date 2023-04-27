@@ -359,9 +359,10 @@ class CheckoutServiceImplement implements CheckoutService
                     $productItems = $checkoutInformation->productItems
                         ->map(fn($item) => ['id'=>$item->id, 'price'=>$item->price, 'discount'=>$item->discount])
                         ->toArray();
+                    $shippingAddress = $checkoutInformation->shipping->shippingAddress;
                     $checkoutInformation->update([
                         'status' => $transaction['transaction_status'],
-                        'custom_properties' => $productItems
+                        'custom_properties' => ['product_items' => $productItems, 'shipping_address' => $shippingAddress]
                     ]);
                     DB::commit();
                     return [

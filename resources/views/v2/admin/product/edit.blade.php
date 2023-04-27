@@ -431,7 +431,7 @@
 
 <div id="indexProductImage" data="{{\App\Models\ProductImage::latest('id')->first()->id + 1}}"></div>
 <div id="indexSimpleProduct" data="{{ @end(array_keys(old('product_items', [\App\Models\ProductItem::latest('id')->first()->id => 0]))) + 1 }}"></div>
-<div id="indexOriginProduct" data="{{ @end(array_keys(old('product_origins', [\App\Models\ProductOrigin::latest('id')->first()->id => 0]))) + 1 }}"></div>
+<div id="indexOriginProduct" data="{{ (int)@end(array_keys(old('product_origins', [\App\Models\ProductOrigin::latest('id')->first()->id => 0]))) + 1 }}"></div>
 
 <section class="flex">
     <button form="product" type="button" class="w-full sm:w-fit ml-auto px-5 h-[42px] bg-color-4 text-white font-semibold uppercase border rounded" onclick="submitProduct(this)">Update Produk</button>

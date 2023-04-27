@@ -101,11 +101,11 @@
     @push('script')
         <script>
             $(document).ready(function () {
-                if (localStorage.getItem("my_app_name_here-quote-scroll") != null) {
-                    $(window).scrollTop(localStorage.getItem("my_app_name_here-quote-scroll"));
+                if (localStorage.getItem("product-show") != null) {
+                    $(window).scrollTop(localStorage.getItem("product-show"));
                 }
                 $(window).on("scroll", function() {
-                    localStorage.setItem("my_app_name_here-quote-scroll", $(window).scrollTop());
+                    localStorage.setItem("product-show", $(window).scrollTop());
                 });
             });
         </script>

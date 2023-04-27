@@ -116,7 +116,7 @@
                 </span>
             @endif
             <div class="flex flex-wrap items-start gap-2">
-                <img src="{{ asset('assets/images/sample.png') }}" alt=""
+                <img src="{{ asset('storage/'.$checkoutItem->productItem->product->productImage->image) }}" alt=""
                     class="{{ $checkoutItem->productItem->stock < $checkoutItem->qty ? 'grayscale' : '' }} w-24">
                 <ul class="max-w-[200px]">
                     <li class="font-bold"><span
