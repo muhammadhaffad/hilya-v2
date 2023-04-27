@@ -144,7 +144,7 @@
                 }
 
                 let tableOrigins = () => {
-                    if (data.is_bundle) {
+                    if (parseInt(data.is_bundle)) {
                         productOrigins = data.product_origins;
                         let table = `<table class="text-xs normal-case">
                         <thead class="text-left border">
@@ -182,7 +182,7 @@
                                 <p class="font-semibold">${data.price - parseInt(data.price*data.discount/100)}</p>
                                 ${promo()}
                             </div>
-                            <span class="text-xs text-red-500 font-semibold">${data.is_bundle ? 'Bundle' : ''}</span>
+                            <span class="text-xs text-red-500 font-semibold">${parseInt(data.is_bundle) ? 'Bundle' : ''}</span>
                         </div>
                         <p class="text-xs normal-case">${'*'+data.note_bene}</p>
                         ${tableOrigins()}
