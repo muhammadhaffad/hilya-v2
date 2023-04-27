@@ -30,7 +30,7 @@
                 </span>
             @endif
             <div class="flex flex-wrap items-stretch gap-2">
-                <img src="{{ asset('assets/images/sample.png') }}" alt=""
+                <img src="{{ asset('storage/'.$cartItem->productItem->product->productImage->image) }}" alt=""
                     class="{{ $cartItem->productItem->stock < $cartItem->qty ? 'grayscale' : '' }} w-24">
                 <ul class="max-w-[200px]">
                     <li class="font-bold"><span

@@ -129,11 +129,11 @@
             </ul>
             <div class="w-full border-b border-color-3">
                 <section id="order-{{$index}}" class="hidden w-full space-y-4">
-                    @php $custom_properties = collect($order->custom_properties) @endphp
+                    @php $custom_properties = $order->custom_properties @endphp
                     @foreach ($order->orderItems as $orderItem)
                         <div class="flex flex-wrap items-start justify-between gap-4 p-2 border border-color-4 rounded-lg">
                             <div class="flex flex-wrap items-start gap-2">
-                                <img src="{{ asset('assets/images/sample.png') }}" alt=""
+                                <img src="{{ asset('storage/'.$orderItem->productItem->product->productImage->image) }}" alt=""
                                     class="w-24">
                                 <ul class="max-w-[300px]">
                                     <li class="font-bold text-ellipsis overflow-hidden"><span
@@ -152,7 +152,7 @@
                                 </ul>
                             </div>
                             <div class="w-max">
-                                @php $property = $custom_properties->where('id', $orderItem->productItem->id)->first() @endphp
+                                @php $property = collect($custom_properties['product_items'])->where('id', $orderItem->productItem->id)->first() @endphp
                                 <ul>
                                     <li class="font-bold text-xl">
                                         {{ $orderItem->qty }} ×
