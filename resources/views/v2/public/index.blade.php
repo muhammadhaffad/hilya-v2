@@ -1,4 +1,4 @@
-@extends('v2.layouts.public.app', ['title'=>'Hillia Collection'])
+@extends('v2.layouts.public.app', ['title'=>'Hilya Collection'])
 @section('content')
 @push('style')
 <link
@@ -13,7 +13,7 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
     <section id="hero" class="grid grid-cols-1 gap-4 items-center px-4">
         <div class="relative">
             <div class="flex flex-col gap-4 py-8 justify-center w-full sm:w-1/2">
-                <p>Selamat Datang di <span class="font-semibold">Hillia Collection</span></p>
+                <p>Selamat Datang di <span class="font-semibold">Hilya Collection</span></p>
                 <h1 class="text-4xl sm:text-6xl font-bold">Temukan Busana Muslim Pilihanmu</h1>
                 <p>Reseller busana muslim terlengkap</p>
                 <button class="hidden sm:block px-5 w-full sm:w-fit h-[42px] bg-color-4 text-white font-semibold uppercase rounded" onclick="window.location.href='{{route('home').'#ready-product'}}'">Mulai Belanja</button>
@@ -45,7 +45,7 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-6">
             @foreach ($readyProducts as $key => $readyProduct)
             <div class="flex flex-col gap-2 h-full">
-                <div class="relative">
+                <div class="relative cursor-pointer" onclick="window.location.href='{{$readyProduct->link}}'">
                     <div class="absolute top-0 left-0 p-2">
                         @if ($readyProduct->availability == 'pre-order')
                             <span class="bg-color-3 text-white p-1 px-2 rounded text-xs font-semibold">PRE-ORDER</span>
@@ -90,7 +90,10 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
         @php
             $productReadyCount = App\Models\Product::ready()->whereHas('productItems', fn ($q) => $q->inStock())->count();
         @endphp
-        @if ($productReadyCount < 40)
+        @if ($productReadyCount >= 20)
+        <button class="px-5 flex mx-auto items-center h-[42px] font-semibold uppercase border border-color-4 hover:bg-color-4 hover:text-white rounded" onclick="window.location.href='{{route('product.ready')}}'">Lihat Semua</button>
+        @endif
+        {{-- @if ($productReadyCount < 40)
             @if ((request()->get('limit') ?? 10) < $productReadyCount)
                 <button class="px-5 flex mx-auto items-center h-[42px] font-semibold uppercase border border-color-4 hover:bg-color-4 hover:text-white rounded" onclick="window.location.href='{{route('home').'?limit='.(request()->get('limit')+10)}}'">Lihat Lainnya</button>
             @endif
@@ -100,7 +103,7 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
             @else
                 <button class="px-5 flex mx-auto items-center h-[42px] font-semibold uppercase border border-color-4 hover:bg-color-4 hover:text-white rounded" onclick="window.location.href='{{route('product.ready')}}'">Lihat Semua</button>
             @endif
-        @endif
+        @endif --}}
     </section>
 
     <section class="mt-16 sm:mt-36 space-y-8 px-4">
@@ -113,7 +116,7 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
                 @forelse ($promoProducts as $key => $promoProduct)
                 <div>
                     <div class="flex flex-col w-[290px] gap-2 h-full">
-                        <div class="relative">
+                        <div class="relative cursor-pointer" onclick="window.location.href='{{$promoProduct->link}}'">
                             <div class="absolute top-0 left-0 p-2">
                                 @if ($promoProduct->availability == 'pre-order')
                                     <span class="bg-color-3 text-white p-1 px-2 rounded text-xs font-semibold">PRE-ORDER</span>
@@ -188,7 +191,7 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
                 @forelse ($preorderProducts as $key => $preorderProduct)
                 <div>
                     <div class="flex flex-col w-[290px] gap-2 h-full">
-                        <div class="relative">
+                        <div class="relative cursor-pointer" onclick="window.location.href='{{$preorderProduct->link}}'">
                             <div class="absolute top-0 left-0 p-2">
                                 @if ($preorderProduct->availability == 'pre-order')
                                     <span class="bg-color-3 text-white p-1 px-2 rounded text-xs font-semibold">PRE-ORDER</span>
@@ -238,16 +241,4 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
             </div>
         </div>
     </section>
-@push('script')
-    <script>
-        $(document).ready(function () {
-            if (localStorage.getItem("my_app_name_here-quote-scroll") != null) {
-                $(window).scrollTop(localStorage.getItem("my_app_name_here-quote-scroll"));
-            }
-            $(window).on("scroll", function() {
-                localStorage.setItem("my_app_name_here-quote-scroll", $(window).scrollTop());
-            });
-        });
-    </script>
-@endpush
 @endsection

@@ -37,9 +37,13 @@
                     </div>
                     @auth
                         @if (auth()->user()->role == 'customer')
-                        <button onclick="window.location.href='{{route('customer.cart')}}'" class="relative block"><span class="material-icons !text-4xl">shopping_bag</span><span class="absolute bottom-0 -right-1 min-w-[24px] bg-red-500 p-1 rounded-full text-xs text-white">{{App\Models\Order::where('status', 'cart')->first()?->orderItems()->count() ?? 0}}</span></button>
+                        <button onclick="window.location.href='{{route('customer.cart')}}'" class="relative flex items-center"><span class="material-icons !text-4xl">shopping_bag</span>
+                            @if (App\Models\Order::where('status', 'cart')->first()?->orderItems()->count())
+                            <span class="absolute -bottom-1 -right-1 min-w-[24px] bg-red-500 p-1 rounded-full text-xs text-white">{{App\Models\Order::where('status', 'cart')->first()?->orderItems()->count() ?? 0}}</span>
+                            @endif
+                        </button>
                         @endif
-                    <button onclick="$('#menu,#menu-background').toggleClass('hidden')" class="block"><span class="material-icons !text-4xl">account_circle</span></button>
+                    <button onclick="$('#menu,#menu-background').toggleClass('hidden')" class="flex items-center"><span class="material-icons !text-4xl">account_circle</span></button>
                         @if (auth()->user()->role == 'admin')
                         <div id="menu-background" class="hidden absolute top-0 bottom-0 left-0 right-0 opacity-100 h-screen w-screen" onclick="$('#menu,#menu-background').toggleClass('hidden')"></div>
                         <div id="menu" class="hidden absolute w-full sm:max-w-xs z-10 top-full right-0 mt-0 sm:mt-4 mr-0 sm:mr-10 p-3 rounded border bg-white shadow-lg">
@@ -119,7 +123,7 @@
             <div class="space-y-3">
                 <h2 class="font-bold text-2xl">Hubungi Kami</h2>
                 <ul class="space-y-1">
-                    <li class="font-semibold">Hillia Collection</li>
+                    <li class="font-semibold">Hilya Collection</li>
                     <li>Teras Keke Lamongan Jl. Nasional 1, Moropelang, Kec. Babat, Kab. Lamongan</li>
                     <li>+62 8120-7232-783</li>
                 </ul>

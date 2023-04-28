@@ -13,8 +13,13 @@
 </head>
 
 <body class="font-inter text-color-4">
+    @if (session('message'))
+    <script>
+        alert('{{session('message')}}');
+    </script>
+    @endif
     <main class="w-full max-w-[1228px] mx-auto overflow-hidden h-fit">
-        <section class="mx-auto mt-20 w-96 space-y-8">
+        <section class="mx-auto mt-20 max-w-[389px] space-y-8">
             <div>
                 <img src="{{asset('assets/images/logo.png')}}" alt="" class="mx-auto w-40">
             </div>

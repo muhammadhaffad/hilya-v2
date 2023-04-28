@@ -1,4 +1,4 @@
-@extends('v2.layouts.admin.app', ['title' => 'Dashboard | Hillia Collection'])
+@extends('v2.layouts.admin.app', ['title' => 'Dashboard | Hilya Collection'])
 @section('content')
 <div class="flex font-bold text-xl gap-1 items-center uppercase">
     <span class="material-icons !text-4xl">

@@ -1,4 +1,4 @@
-@extends('v2.layouts.customer.app', ['title' => 'Buku Alamat | Hillia Collection'])
+@extends('v2.layouts.customer.app', ['title' => 'Buku Alamat | Hilya Collection'])
 @section('content')
 <div class="flex font-bold text-xl gap-1 items-center uppercase">
     <span class="material-icons !text-4xl">

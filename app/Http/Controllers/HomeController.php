@@ -28,7 +28,7 @@ class HomeController extends Controller
         } else {
             $productBrands = [];
         }
-        $result = $this->productService->getProductsByAvailability('ready', 0, $request->get('limit') ?? 10);
+        $result = $this->productService->getProductsByAvailability('ready', 0, 20);
         if ($result['code'] == 200) {
             $readyProducts = $result['data'];
         } else {

@@ -22,7 +22,7 @@
                 </div>
                 <div class="hidden sm:flex items-center gap-3 cursor-pointer" onclick="window.location.href='{{route('home')}}'">
                     <img class="w-20" src="{{ asset('assets/images/logo.png') }}" alt="">
-                    <h1 class="text-xl"><span class="font-bold">Hillia</span> <span
+                    <h1 class="text-xl"><span class="font-bold">Hilya</span> <span
                             class="text-color-2">Collection</span></h1>
                 </div>
                 <div class="flex items-center gap-3">
@@ -30,8 +30,12 @@
                         <span class="material-icons !text-3xl">search</span>
                         <button class="hidden sm:block w-40 text-left text-color-2">Cari produk disini...</button>
                     </div>
-                    <button onclick="window.location.href='{{route('customer.cart')}}'" class="relative block"><span class="material-icons !text-4xl">shopping_bag</span><span class="absolute bottom-0 -right-1 min-w-[24px] bg-red-500 p-1 rounded-full text-xs text-white">{{App\Models\Order::where('status', 'cart')->first()?->orderItems()->count() ?? 0}}</span></button>
-                    <button onclick="$('#menu,#menu-background').toggleClass('hidden')" class="block"><span class="material-icons !text-4xl">account_circle</span></button>
+                    <button onclick="window.location.href='{{route('customer.cart')}}'" class="relative flex items-center"><span class="material-icons !text-4xl">shopping_bag</span>
+                    @if (App\Models\Order::where('status', 'cart')->first()?->orderItems()->count())
+                    <span class="absolute -bottom-1 -right-1 min-w-[24px] bg-red-500 p-1 rounded-full text-xs text-white">{{App\Models\Order::where('status', 'cart')->first()?->orderItems()->count() ?? 0}}</span>
+                    @endif
+                    </button>
+                    <button onclick="$('#menu,#menu-background').toggleClass('hidden')" class="flex items-center"><span class="material-icons !text-4xl">account_circle</span></button>
                 </div>
                 <div id="menu-background" class="hidden absolute top-0 bottom-0 left-0 right-0 opacity-100 h-screen w-screen" onclick="$('#menu,#menu-background').toggleClass('hidden')"></div>
                 <div id="menu" class="hidden absolute w-full sm:max-w-xs z-10 top-full right-0 mt-0 sm:mt-4 mr-0 sm:mr-10 p-3 rounded border bg-white shadow-lg">
@@ -127,6 +131,14 @@
                         </a>
                     </li>
                     <hr>
+                    <li class="p-1 rounded bg-color-4 text-white">
+                        <a href="{{route('home')}}" class="flex items-center gap-1">
+                            <div class="w-9 flex items-center justify-center">
+                                <span class="material-icons !text-3xl">arrow_back</span>
+                            </div>
+                            Kembali ke Homepage
+                        </a>
+                    </li>
                     <li class="p-1 rounded bg-red-500 text-white">
                         <form action="{{route('logout')}}" onsubmit="return confirm('Apakah Anda yakin ingin keluar?')" method="post">
                             @csrf

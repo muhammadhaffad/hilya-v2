@@ -1,4 +1,4 @@
-@extends('v2.layouts.admin.app', ['title' => 'Pengaturan Akun | Hillia Collection', 'notfound' => false])
+@extends('v2.layouts.admin.app', ['title' => 'Pengaturan Akun | Hilya Collection', 'notfound' => false])
 @section('content')
 <div class="flex font-bold text-xl gap-1 items-center uppercase">
     <span class="material-icons !text-4xl">

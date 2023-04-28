@@ -1,4 +1,4 @@
-@extends('v2.layouts.public.app', ['title'=>'Hillia Collection'])
+@extends('v2.layouts.public.app', ['title'=>'Hilya Collection'])
 @section('content')
 @push('style')
 <link
@@ -15,7 +15,7 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-6">
             @forelse ($preorderProducts as $key => $preorderProduct)
             <div class="flex flex-col gap-2 h-full">
-                <div class="relative">
+                <div class="relative cursor-pointer" onclick="window.location.href='{{$preorderProduct->link}}'">
                     <div class="absolute top-0 left-0 p-2">
                         @if ($preorderProduct->availability == 'pre-order')
                             <span class="bg-color-3 text-white p-1 px-2 rounded text-xs font-semibold">PRE-ORDER</span>

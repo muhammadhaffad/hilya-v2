@@ -1,4 +1,4 @@
-@extends('v2.layouts.customer.app', ['title' => 'Detail Pesanan | Hillia Collection'])
+@extends('v2.layouts.customer.app', ['title' => 'Detail Pesanan | Hilya Collection'])
 @section('content')
 @php
     $custom_properties = $order->custom_properties;
@@ -40,14 +40,76 @@
     <section class="p-5 gap-4 flex flex-wrap justify-between border border-color-4 rounded-lg">
         <ul class="max-w-full">
             <li>Bank: <span class="font-semibold uppercase">{{ $order->payment->bank }}</span></li>
-            <li>Nomor VA: 
-                <span class="flex flex-nowrap items-center justify-between w-full px-1 gap-1 font-semibold border border-color-2 text-color-3 rounded">
+            <li class="flex items-center whitespace-nowrap gap-1">Nomor VA: 
+                <span class="flex flex-nowrap items-center w-min overflow-hidden px-1 gap-1 font-semibold border border-color-2 text-color-3 rounded">
                     <span class="material-icons !text-base">content_copy</span>
                     <span class="overflow-auto">
                         {{ $order->payment->vanumber }}
                     </span>
                 </span>
             </li>
+            <li>
+                <button class="flex items-center gap-1 font-semibold text-blue-500" onclick="$('#modal-payment').toggleClass('hidden');$('#bg-modal').toggleClass('hidden')">
+                    <span class="material-icons !text-base">help</span>
+                    Cara bayar
+                </button>
+            </li>
+            <div id="bg-modal" class="hidden fixed top-0 right-0 left-0 bottom-0 h-full bg-color-4 opacity-50 z-40"></div>
+            <div id="modal-payment" class="hidden fixed top-0 right-1/2 translate-x-1/2 bg-white border border-color-4 w-full sm:w-fit p-5 rounded z-50">
+                <button class="flex ml-auto mb-4" onclick="$('#modal-payment').toggleClass('hidden');$('#bg-modal').toggleClass('hidden')">
+                    <span class="material-icons">
+                        close
+                    </span>
+                </button>
+                @if ($order->payment->bank == 'bri')
+                <div class="h-96 pl-5 overflow-y-auto space-y-2">
+                    <h3 class="font-bold">ATM BRI</h3>
+                    <ol class="list-decimal">
+                        <li>Pilih transaksi lainnya pada menu utama.</li>
+                        <li>Pilih pembayaran.</li>
+                        <li>Pilih lainnya.</li>
+                        <li>Pilih BRIVA.</li>
+                        <li>Masukkan {{ $order->payment->vanumber }}, lalu konfirmasi.</li>
+                        <li>Pembayaran berhasil.</li>
+                    </ol>
+                    <h3 class="font-bold">IB BRI</h3>
+                    <ol class="list-decimal">
+                        <li>Pilih pembayaran & pembelian.</li>
+                        <li>Pilih BRIVA.</li>
+                        <li>Masukkan {{ $order->payment->vanumber }}, lalu konfirmasi.</li>
+                        <li>Pembayaran berhasil.</li>
+                    </ol>
+                    <h3 class="font-bold">BRImo</h3>
+                    <ol class="list-decimal">
+                        <li>Pilih pembayaran.</li>
+                        <li>Pilih BRIVA.</li>
+                        <li>Masukkan {{ $order->payment->vanumber }}, lalu konfirmasi.</li>
+                        <li>Pembayaran berhasil.</li>
+                    </ol>
+                </div>
+                @endif
+                @if ($order->payment->bank == 'bni')
+                <div class="h-96 pl-5 overflow-y-auto space-y-2">
+                    <h3 class="font-bold">ATM BNI</h3>
+                    <ol class="list-decimal">
+                        <li>Pilih menu lain pada menu utama.</li>
+                        <li>Pilih transfer.</li>
+                        <li>Pilih ke rekening BNI.</li>
+                        <li>Masukkan nomor rekening pembayaran.</li>
+                        <li>Masukkan jumlah yang akan dibayar, lalu konfirmasi.</li>
+                        <li>Pembayaran berhasil.</li>
+                    </ol>
+                    <h3 class="font-bold">Mobile Banking</h3>
+                    <ol class="list-decimal">
+                        <li>Pilih transfer.</li>
+                        <li>Pilih virtual account billing.</li>
+                        <li>Pilih rekening debit yang akan digunakan.</li>
+                        <li>Masukkan nomor virtual account, lalu konfirmasi.</li>
+                        <li>Pembayaran berhasil.</li>
+                    </ol>
+                </div> 
+                @endif
+            </div>
         </ul>
         <ul>
             <li>Waktu Transaksi: <span class="font-semibold">{{ \Carbon\Carbon::parse($order->payment->transactiontime)->format('d F Y H:i:s') }}</span></li>
