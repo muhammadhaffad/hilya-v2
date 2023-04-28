@@ -1,4 +1,4 @@
-@extends('v2.layouts.admin.app', ['title' => 'Produk | Admin Hillia Collection'])
+@extends('v2.layouts.admin.app', ['title' => 'Produk | Admin Hilya Collection'])
 @section('content')
 @push('script-head')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>

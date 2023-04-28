@@ -21,7 +21,7 @@ class AuthenticationController extends Controller
     {
         $result = $this->authService->register($request);
         if ($result['code'] == 201) {
-            return redirect()->to('/login');
+            return redirect()->to('/login')->with('message', 'Berhasil mendaftar, silahkan login...');
         } else {
             return redirect()->back()->withErrors($result['errors']);
         }

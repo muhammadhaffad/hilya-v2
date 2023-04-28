@@ -1,4 +1,4 @@
-@extends('v2.layouts.customer.app', ['title' => 'Checkout | Hillia Collection'])
+@extends('v2.layouts.customer.app', ['title' => 'Checkout | Hilya Collection'])
 @section('content')
     @php
         $provinces = Helper::getProvinces();

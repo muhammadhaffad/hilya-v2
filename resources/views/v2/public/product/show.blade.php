@@ -1,4 +1,4 @@
-@extends('v2.layouts.public.app', ['title' => 'Hillia Collection'])
+@extends('v2.layouts.public.app', ['title' => 'Hilya Collection'])
 @section('content')
     @push('style')
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
@@ -34,7 +34,7 @@
                 </div>
             </div>
         </div>
-        <div class="space-y-2">
+        <div  id="choose-product" class="space-y-2">
             <h3 class="uppercase font-semibold text-xl">{{$product->productBrand->name}}</h3>
             <h1 class="text-4xl">{{$product->name}}</h1>
             <div>
@@ -57,7 +57,7 @@
                 @endif
             </div>
             <span class="block">{{$product->category ?? 'Busana'}}</span>
-            <form action="" method="get" class="space-y-2">
+            <form action="#choose-product" method="get" class="space-y-2">
                 <div>
                     <label class="font-semibold" for="">Pilih untuk:</label>
                     <div id="gender" class="flex flex-wrap gap-x-2 gap-y-2">
@@ -84,7 +84,7 @@
             </form>
             <div>
                 <label class="font-semibold">Deskripsi</label>
-                <p>{{$product->description}}</p>
+                <p>{!!$product->description!!}</p>
             </div>
         </div>
     </section>
@@ -100,19 +100,16 @@
     @endif
     @push('script')
         <script>
-            $(document).ready(function () {
-                if (localStorage.getItem("product-show") != null) {
-                    $(window).scrollTop(localStorage.getItem("product-show"));
-                }
-                $(window).on("scroll", function() {
-                    localStorage.setItem("product-show", $(window).scrollTop());
-                });
-            });
-        </script>
-        <script>
             const urlParam = new URLSearchParams(window.location.search);
             const productDetail = JSON.parse($('#product_detail').text());
             const productItems = productDetail.product_items;
+
+            function rupiah(number){
+                let rupiah = '';		
+                let numberrev = number.toString().split('').reverse().join('');
+                for(let i = 0; i < numberrev.length; i++) if(i%3 == 0) rupiah += numberrev.substr(i,3)+'.';
+                return 'Rp'+rupiah.split('',rupiah.length-1).reverse().join('');
+            }
 
             function generateGenderButton(key, data) {
                 let button = `<button class="flex">
@@ -177,14 +174,14 @@
                     <input id="size-${key}" type="radio" name="product_item_id" value="${data.id}" class="hidden peer">
                     <label for="size-${key}" class="p-1 h-fit border border-color-4 rounded uppercase peer-checked:bg-color-1 cursor-pointer">
                         <div class="flex gap-1 text-sm">
-                            <span class="py-1 px-2 h-fit bg-color-4 text-white rounded whitespace-nowrap">${data.size} ${data.stock}</span>
+                            <span class="py-1 px-2 h-fit bg-color-4 text-white rounded whitespace-nowrap">${data.size} | ${data.stock}</span>
                             <div class="grow">
-                                <p class="font-semibold">${data.price - parseInt(data.price*data.discount/100)}</p>
+                                <p class="font-semibold">${rupiah(data.price - parseInt(data.price*data.discount/100))}</p>
                                 ${promo()}
                             </div>
                             <span class="text-xs text-red-500 font-semibold">${parseInt(data.is_bundle) ? 'Bundle' : ''}</span>
                         </div>
-                        <p class="text-xs normal-case">${'*'+data.note_bene}</p>
+                        <p class="text-xs normal-case">${data.note_bene != 'null' ? '' : data.note_bene}</p>
                         ${tableOrigins()}
                     </label>
                 </button>`;
@@ -203,7 +200,7 @@
                             <span class="material-icons !text-base">add</span>
                         </button>
                     </div>
-                    <button type="submit" class="flex items-center justify-center px-4 bg-color-4 text-white uppercase rounded">
+                    <button type="submit" class="flex items-center justify-center px-2 py-2 bg-color-4 text-white uppercase rounded">
                         Tambah ke Keranjang
                     </button>
                 </div>`;

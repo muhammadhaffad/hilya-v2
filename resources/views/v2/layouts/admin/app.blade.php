@@ -23,7 +23,7 @@
                 </div>
                 <div class="hidden sm:flex items-center gap-3 cursor-pointer" onclick="window.location.href='{{route('home')}}'">
                     <img class="w-20" src="{{ asset('assets/images/logo.png') }}" alt="">
-                    <h1 class="text-xl"><span class="font-bold">Hillia</span> <span
+                    <h1 class="text-xl"><span class="font-bold">Hilya</span> <span
                             class="text-color-2">Collection</span></h1>
                 </div>
                 <div class="flex items-center gap-3">
@@ -101,6 +101,14 @@
                         </a>
                     </li>
                     <hr>
+                    <li class="p-1 rounded bg-color-4 text-white">
+                        <a href="{{route('home')}}" class="flex items-center gap-1">
+                            <div class="w-9 flex items-center justify-center">
+                                <span class="material-icons !text-3xl">arrow_back</span>
+                            </div>
+                            Kembali ke Homepage
+                        </a>
+                    </li>
                     <li class="p-1 rounded bg-red-500 text-white">
                         <form action="{{route('logout')}}" onsubmit="return confirm('Apakah Anda yakin ingin keluar?')" method="post">
                             @csrf

@@ -1,4 +1,4 @@
-@extends('v2.layouts.customer.app', ['title' => 'Buku Alamat | Hillia Collection'])
+@extends('v2.layouts.customer.app', ['title' => 'Buku Alamat | Hilya Collection'])
 @section('content')
 @php
     if ($addresses !== []) {
@@ -26,7 +26,7 @@
             class="{{$address->isselect ? 'bg-color-1' : ''}} block rounded-lg border border-color-4">
             <div class="p-4 space-y-4">
                 <div class="flex flex-wrap gap-2 justify-between">
-                    <span class="w-min p-1 px-2 bg-color-4 text-white rounded">
+                    <span class="p-1 px-2 bg-color-4 text-white rounded">
                         {{ $address->addressname }}
                     </span>
                     <div class="flex gap-2 ml-auto">
@@ -112,8 +112,10 @@
         </div>
     </li>
     @empty
-    <div class="w-full h-72 flex items-center justify-center text-xl border rounded">
-        Selesaikan pendaftaran dengan menambahkan alamat Anda
+    <div class="flex flex-col justify-center w-full h-72 text-center text-xl border rounded">
+        <span>
+            Selesaikan pendaftaran dengan menambahkan alamat Anda
+        </span>
     </div>
     @endforelse
 </ul>

@@ -1,4 +1,4 @@
-@extends('v2.layouts.admin.app', ['title' => 'Detail Pesanan | Hillia Collection'])
+@extends('v2.layouts.admin.app', ['title' => 'Detail Pesanan | Hilya Collection'])
 @section('content')
 @php
     $custom_properties = $order->custom_properties;
