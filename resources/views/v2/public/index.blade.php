@@ -15,7 +15,7 @@ href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
             <div class="flex flex-col gap-4 py-8 justify-center w-full sm:w-1/2">
                 <p>Selamat Datang di <span class="font-semibold">Hilya Collection</span></p>
                 <h1 class="text-4xl sm:text-6xl font-bold">Temukan Busana Muslim Pilihanmu</h1>
-                <p>Reseller busana muslim terlengkap</p>
+                <p>Distributor busana muslim terlengkap</p>
                 <button class="hidden sm:block px-5 w-full sm:w-fit h-[42px] bg-color-4 text-white font-semibold uppercase rounded" onclick="window.location.href='{{route('home').'#ready-product'}}'">Mulai Belanja</button>
             </div>
             <img src="{{asset('assets/images/hero image.png')}}" class="absolute h-full bg-contain ml-auto bottom-0 -z-10 right-0">
