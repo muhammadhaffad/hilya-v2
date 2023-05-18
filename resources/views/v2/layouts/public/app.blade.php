@@ -125,7 +125,7 @@
                 <ul class="space-y-1">
                     <li class="font-semibold">Hilya Collection</li>
                     <li>Teras Keke Lamongan Jl. Nasional 1, Moropelang, Kec. Babat, Kab. Lamongan</li>
-                    <li>+62 8573-2698-149</li>
+                    <a href="https://wa.me/6285732698149" target="blank">+62 8573-2698-149</a>
                 </ul>
             </div>
             <div class="space-y-3">
